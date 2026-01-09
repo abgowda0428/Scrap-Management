@@ -138,6 +138,8 @@ import { UserManagementEnhanced } from './components/UserManagementEnhanced';
 import { ApprovalDashboard } from './components/ApprovalDashboard';
 import { CutPiecesTracking } from './components/CutPiecesTracking';
 import { useEffect } from 'react';
+import { RawMaterialPage } from './pages/RawMaterialPage';
+
 import autocratLogo from 'figma:asset/1ad85b15198cdb675e83e1093de980f6661c927d.png';
 import { ROLE_PERMISSIONS } from '../src//config/permissions';
 import { AccessDenied } from './components/AccessDenied';
@@ -329,7 +331,7 @@ import { AccessDenied } from './components/AccessDenied';
         {currentScreen === 'end-pieces' && <EndPieces />}
         {currentScreen === 'approval-dashboard' && <ApprovalDashboard />}
         {currentScreen === 'reports' && <Reports />}
-        {currentScreen === 'materials' && <Materials />}
+        {currentScreen === 'materials' && <RawMaterialPage />}
         {currentScreen === 'user-management' && <UserManagementEnhanced />}
       </main>
     </div>
