@@ -375,7 +375,7 @@ export function Navigation() {
         id: 'approval-dashboard',
         label: 'Approvals',
         icon: CheckSquare,
-        roles: ['SUPERVISOR','MANAGER'],
+        roles: ['SUPERVISOR','MANAGER','OPERATOR'],
       },
 
       {

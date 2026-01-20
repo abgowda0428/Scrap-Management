@@ -289,14 +289,23 @@ import { AccessDenied } from './components/AccessDenied';
       'dashboard',
       'create-job',
       'my-jobs',
-      'scrap-entry',
-      'cut-pieces',
       'materials',
-      'reports',
       'user-management',
-      'approval-dashboard'
     ],
   };
+
+  //  MANAGER: [
+  //     'dashboard',
+  //     'create-job',
+  //     'my-jobs',
+  //     'scrap-entry',
+  //     'cut-pieces',
+  //     'end-pieces',
+  //     'materials',
+  //     'reports',
+  //     'user-management',
+  //     'approval-dashboard'
+  //   ],
 
   const allowedScreens = ROLE_PERMISSIONS[currentUser.role] || [];
 
