@@ -548,7 +548,9 @@ export function CreateCuttingJob() {
      DERIVED DATA
   -------------------------------------------------- */
   const activeMachines = machines; // All fetched are ACTIVE
-  const activeMaterials = materials.filter(m => m.current_stock_qty > 0);
+  //const activeMaterials = materials.filter(m => m.current_stock_qty > 0); prajeeth
+  const activeMaterials = materials;
+
 
   /* --------------------------------------------------
      LOAD MASTER DATA

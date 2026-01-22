@@ -5,7 +5,9 @@ import { Layout } from './layout/Layout';
 import { DashboardOperator } from './dashboards/DashboardOperator';
 import { DashboardSupervisor } from './dashboards/DashboardSupervisor';
 import { DashboardManager } from './dashboards/DashboardManager';
-import { CuttingJobList } from './jobs/CuttingJobList';
+import CuttingJobList from './components/jobs/CuttingJobList';
+
+
 import { CuttingJobForm } from './jobs/CuttingJobForm';
 import { CuttingOperationEntry } from './operations/CuttingOperationEntry';
 import { EndPieceInventory } from './endpieces/EndPieceInventory';
@@ -46,6 +48,7 @@ export function MainApp() {
       
       case 'jobs':
         return <CuttingJobList onNavigate={setCurrentScreen} onSelectJob={setSelectedJobId} />;
+        
       
       case 'create-job':
         return <CuttingJobForm onNavigate={setCurrentScreen} />;
