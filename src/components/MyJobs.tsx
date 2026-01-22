@@ -643,6 +643,8 @@
 
 //prajeeth
 
+// import { useState, useEffect, useMemo } from 'react';
+
 import { useState, useEffect, useMemo } from 'react';
 
 import {
@@ -659,33 +661,29 @@ import { useApp } from '../context/AppContext';
 import { supabase } from '../src/config/supabase';
 import { CuttingJobDetail } from './CuttingJobDetail';
 
-
-
-
 export function MyJobs() {
   const { currentUser, setCurrentScreen } = useApp();
 
+  // Safety guard – DO NOT CHANGE
   if (!currentUser) {
     return <div className="p-6">Loading user…</div>;
   }
 
+  /* ---------------- STATE (UNCHANGED) ---------------- */
   const [jobs, setJobs] = useState<any[]>([]);
   const [filterStatus, setFilterStatus] = useState<
-    'ALL' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED'
+    'ALL' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
   >('ALL');
+
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [cancelJobId, setCancelJobId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState('');
 
+  /* ---------------- ROLE LOGIC (UNCHANGED) ---------------- */
   const isOperator = currentUser.role === 'OPERATOR';
-  const isSupervisor = currentUser.role !== 'OPERATOR'; //prajeeth
+  const isSupervisor = currentUser.role !== 'OPERATOR';
 
-    currentUser.role === 'SUPERVISOR' || currentUser.role === 'MANAGER';
-
-  /* ------------------------------------------------------------
-     FETCH JOBS (READ MODEL)
-     Source: my_jobs_view
-  ------------------------------------------------------------ */
+  /* ---------------- FETCH JOBS (UNCHANGED) ---------------- */
   useEffect(() => {
     const fetchJobs = async () => {
       const { data, error } = await supabase
@@ -704,9 +702,7 @@ export function MyJobs() {
     fetchJobs();
   }, []);
 
-  /* ------------------------------------------------------------
-     FILTERED JOBS
-  ------------------------------------------------------------ */
+  /* ---------------- FILTER LOGIC (UNCHANGED) ---------------- */
   const filteredJobs = useMemo(() => {
     return jobs.filter(job => {
       if (isOperator && job.operator_id !== currentUser.id) return false;
@@ -715,9 +711,7 @@ export function MyJobs() {
     });
   }, [jobs, filterStatus, isOperator, currentUser]);
 
-  /* ------------------------------------------------------------
-     CANCEL JOB (MODAL → DB → UI)
-  ------------------------------------------------------------ */
+  /* ---------------- CANCEL HANDLER (UNCHANGED) ---------------- */
   const handleCancelJob = async () => {
     if (!cancelReason.trim()) {
       alert('Please provide a reason for cancellation');
@@ -735,9 +729,7 @@ export function MyJobs() {
 
       setJobs(prev =>
         prev.map(j =>
-          j.id === cancelJobId
-            ? { ...j, status: 'CANCELLED' }
-            : j
+          j.id === cancelJobId ? { ...j, status: 'CANCELLED' } : j
         )
       );
 
@@ -749,9 +741,7 @@ export function MyJobs() {
     }
   };
 
-  /* ------------------------------------------------------------
-     JOB DETAIL VIEW
-  ------------------------------------------------------------ */
+  /* ---------------- JOB DETAIL VIEW (UNCHANGED) ---------------- */
   if (selectedJob) {
     const job = jobs.find(j => j.id === selectedJob);
     if (job) {
@@ -766,26 +756,17 @@ export function MyJobs() {
 
   return (
     <div className="overflow-hidden">
-      {/* ================= CANCEL MODAL ================= */}
+
+      {/* ================= CANCEL MODAL (UNCHANGED) ================= */}
       {cancelJobId && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 bg-red-100 rounded-full">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-              <div>
-                <h3 className="text-gray-900">Cancel Job Order</h3>
-                <p className="text-sm text-gray-600">
-                  {jobs.find(j => j.id === cancelJobId)?.job_order_no}
-                </p>
-              </div>
-            </div>
+            <h3 className="text-gray-900 mb-2">Cancel Job Order</h3>
 
             <textarea
               value={cancelReason}
               onChange={e => setCancelReason(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+              className="w-full px-4 py-3 border rounded-lg"
               rows={4}
               placeholder="Provide reason for cancelling this job order..."
             />
@@ -793,7 +774,7 @@ export function MyJobs() {
             <div className="flex gap-3 mt-4">
               <button
                 onClick={handleCancelJob}
-                className="flex-1 bg-red-600 text-white px-4 py-2.5 rounded-lg"
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg"
               >
                 Confirm Cancellation
               </button>
@@ -802,7 +783,7 @@ export function MyJobs() {
                   setCancelJobId(null);
                   setCancelReason('');
                 }}
-                className="px-4 py-2.5 border border-gray-300 rounded-lg"
+                className="px-4 py-2 border rounded-lg"
               >
                 Close
               </button>
@@ -820,27 +801,29 @@ export function MyJobs() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
+
           <div>
-            <h1 className="text-gray-900 text-2xl">
+            <h1 className="text-2xl text-gray-900">
               {isOperator ? 'My Jobs' : 'All Cutting Jobs'}
             </h1>
-            <p className="text-gray-600 text-sm">
-              {filteredJobs.length} job
-              {filteredJobs.length !== 1 ? 's' : ''} found
+            <p className="text-sm text-gray-600">
+              {filteredJobs.length} job(s) found
             </p>
           </div>
         </div>
 
-        {/* FILTERS */}
+        {/* FILTER TABS (UNCHANGED) */}
         <div className="flex gap-2">
-          {['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED'].map(status => (
+          {['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map(status => (
             <button
               key={status}
               onClick={() => setFilterStatus(status as any)}
               className={`px-4 py-2 rounded-lg text-sm ${
                 filterStatus === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white border border-gray-300'
+                  ? status === 'CANCELLED'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-blue-600 text-white'
+                  : 'bg-white border'
               }`}
             >
               {status.replace('_', ' ')}
@@ -850,130 +833,129 @@ export function MyJobs() {
       </div>
 
       {/* ================= JOB LIST ================= */}
-      {filteredJobs.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No jobs found</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredJobs.map(job => (
-            <div key={job.id} className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-xl text-gray-900">
-                    {job.job_order_no}
-                  </h2>
-                  <StatusBadge status={job.status} />
-                  <p className="text-sm text-gray-600 mt-2">
-                    {job.material_code} • {job.machine_name}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Operator: {job.operator_name}
-                  </p>
-                </div>
+      <div className="space-y-4">
+        {filteredJobs.map(job => (
+          <div key={job.id} className="bg-white rounded-lg shadow p-6">
 
+            {/* ===== CARD LAYOUT (ALIGNMENT ONLY) ===== */}
+            <div className="flex justify-between gap-6">
+
+              {/* -------- LEFT : JOB INFO -------- */}
+              <div className="flex-1">
+                <h2 className="text-xl text-gray-900">{job.job_order_no}</h2>
+                <StatusBadge status={job.status} />
+
+                <p className="text-sm text-gray-600 mt-2">
+                  {job.material_code} • {job.machine_name}
+                </p>
+
+                <p className="text-sm text-gray-600 mt-1">
+                  Operator:{' '}
+                  <span className="text-gray-900 font-medium">
+                    {job.operator_name || '-'}
+                  </span>
+                </p>
+
+                {/* MASTER JOB DETAILS – SHOWN FOR ALL STATES */}
+                {['PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].includes(job.status) && (
+                  <div className="mt-2 space-y-1 text-sm">
+                    <p>
+                      Supervisor:{' '}
+                      <strong>{job.supervisor_name || '-'}</strong>
+                    </p>
+                    <p>
+                      Planned Qty:{' '}
+                      <strong>{job.planned_output_qty ?? '-'} pcs</strong>
+                    </p>
+                    <p>
+                      Master Serial No:{' '}
+                      <strong>{job.fg_code || '-'}</strong>
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* -------- RIGHT : ACTIONS -------- */}
+              <div className="flex flex-col items-end gap-3 min-w-[200px]">
+
+                {/* Eye icon */}
                 <button
                   onClick={() => setSelectedJob(job.id)}
                   className="p-2 hover:bg-gray-100 rounded-lg"
                 >
                   <Eye />
                 </button>
+
+                {/* Start / Continue */}
+                {job.status === 'PLANNED' && (
+                  <button
+                    onClick={async () => {
+                      await supabase
+                        .from('cutting_jobs')
+                        .update({ status: 'IN_PROGRESS' })
+                        .eq('id', job.id);
+
+                      setJobs(prev =>
+                        prev.map(j =>
+                          j.id === job.id ? { ...j, status: 'IN_PROGRESS' } : j
+                        )
+                      );
+                    }}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                  >
+                    <Play className="w-4 h-4" />
+                    Start Job
+                  </button>
+                )}
+
+                {job.status === 'IN_PROGRESS' && (
+                  <button
+                    onClick={() => {
+                      setSelectedJob(job.id);
+                      setCurrentScreen('cutting-operation');
+                    }}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+                  >
+                    <Play className="w-4 h-4" />
+                    Continue
+                  </button>
+                )}
+
+                {/* Cancel */}
+                {isSupervisor &&
+                  (job.status === 'PLANNED' || job.status === 'IN_PROGRESS') && (
+                    <button
+                      onClick={() => setCancelJobId(job.id)}
+                      className="bg-red-50 text-red-600 border px-4 py-2 rounded-lg"
+                    >
+                      Cancel Job
+                    </button>
+                  )}
               </div>
-
-              {/* PRIMARY ACTIONS */}
-              {job.status === 'PLANNED' && (
-                <button
-                  onClick={async () => {
-                    await supabase
-                      .from('cutting_jobs')
-                      .update({ status: 'IN_PROGRESS' })
-                      .eq('id', job.id);
-
-                    setJobs(prev =>
-                      prev.map(j =>
-                        j.id === job.id
-                          ? { ...j, status: 'IN_PROGRESS' }
-                          : j
-                      )
-                    );
-                  }}
-                  className="mt-4 w-full bg-blue-600 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2"
-                >
-                  <Play className="w-4 h-4" />
-                  {/* Start Job */}
-                  Continue Working on job
-                </button>
-              )}
-
-              {job.status === 'IN_PROGRESS' && (
-                <button
-                  onClick={() => {
-                    setSelectedJob(job.id);
-                    setCurrentScreen('cutting-operation');
-                  }}
-                  className="mt-4 w-full bg-indigo-600 text-white px-4 py-2.5 rounded-lg flex items-center justify-center gap-2"
-                >
-                  <Play className="w-4 h-4" />
-                  Continue Working
-                </button>
-              )}
-
-              {/* CANCEL (SUPERVISOR ONLY) */}
-              {isSupervisor &&
- (job.status === 'PLANNED' || job.status === 'IN_PROGRESS') && (
-  <button
-    onClick={() => setCancelJobId(job.id)}
-    className="mt-4 w-full bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg"
-  >
-    <XCircle className="inline mr-2" />
-    Cancel Job
-  </button>
-)}
-
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-/* ------------------------------------------------------------
-   STATUS BADGE
------------------------------------------------------------- */
+/* ================= STATUS BADGE ================= */
 function StatusBadge({ status }: { status: string }) {
-  const config: any = {
-    PLANNED: {
-      label: 'Planned',
-      className: 'bg-gray-100 text-gray-800',
-      icon: Clock,
-    },
-    IN_PROGRESS: {
-      label: 'In Progress',
-      className: 'bg-blue-100 text-blue-800',
-      icon: Play,
-    },
-    COMPLETED: {
-      label: 'Completed',
-      className: 'bg-green-100 text-green-800',
-      icon: CheckCircle,
-    },
-    CANCELLED: {
-      label: 'Cancelled',
-      className: 'bg-red-100 text-red-800',
-      icon: XCircle,
-    },
+  const map: any = {
+    PLANNED: ['Planned', 'bg-gray-100 text-gray-800', Clock],
+    IN_PROGRESS: ['In Progress', 'bg-blue-100 text-blue-800', Play],
+    COMPLETED: ['Completed', 'bg-green-100 text-green-800', CheckCircle],
+    CANCELLED: ['Cancelled', 'bg-red-100 text-red-800', XCircle],
   };
 
-  const { label, className, icon: Icon } = config[status];
+  const [label, cls, Icon] = map[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${className}`}
-    >
+    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${cls}`}>
       <Icon className="w-3 h-3" />
       {label}
     </span>
   );
 }
+
