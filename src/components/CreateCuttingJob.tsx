@@ -499,6 +499,11 @@ function generateJobOrderNumber() {
   return `WO-${year}-${month}-${randomNum}`;
 }
 
+const normalize = (obj: Record<string, any>) =>
+  Object.fromEntries(
+    Object.entries(obj).map(([k, v]) => [k, v === '' ? null : v])
+  );
+
 export function CreateCuttingJob() {
   const { currentUser, setCurrentScreen } = useApp();
   
@@ -525,11 +530,11 @@ export function CreateCuttingJob() {
     job_order_no: generateJobOrderNumber(),
     job_date: new Date().toISOString().split('T')[0],
     shift: currentUser?.shift || 'DAY',
-    operator_id: currentUser?.role === 'OPERATOR' ? currentUser.id : '',
-    supervisor_id: '',
-    machine_id: '',
+    operator_id: currentUser?.role === 'OPERATOR' ? currentUser.id : null,
+    supervisor_id: null as string | null,
+    machine_id: null as string | null,
     fg_code: '',
-    material_id: '',
+    material_id: null as string | null,
     rm_batch_no: '',
     raw_material_weight_kg: '',
     planned_output_qty: '',
@@ -543,7 +548,9 @@ export function CreateCuttingJob() {
      DERIVED DATA
   -------------------------------------------------- */
   const activeMachines = machines; // All fetched are ACTIVE
-  const activeMaterials = materials.filter(m => m.current_stock_qty > 0);
+  //const activeMaterials = materials.filter(m => m.current_stock_qty > 0); prajeeth
+  const activeMaterials = materials;
+
 
   /* --------------------------------------------------
      LOAD MASTER DATA
@@ -606,6 +613,11 @@ export function CreateCuttingJob() {
   -------------------------------------------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.material_id || !formData.machine_id || !formData.supervisor_id) {
+      alert('Please fill all required fields');
+      return;
+    }
     
     // Generate scrap tracking ID
     const scrapTrackingId = `SCR-TRK-${Date.now()}`;
@@ -615,9 +627,9 @@ export function CreateCuttingJob() {
       job_date: formData.job_date,
       shift: formData.shift,
 
-      operator_id: formData.operator_id,
-      supervisor_id: formData.supervisor_id,
-      machine_id: formData.machine_id,
+      operator_id: formData.operator_id || null,
+      supervisor_id: formData.supervisor_id || null,
+      machine_id: formData.machine_id || null,
 
       // ALWAYS save what operator typed
       fg_code: formData.fg_code.trim(),
@@ -636,12 +648,13 @@ export function CreateCuttingJob() {
 
       status: 'PLANNED',
       sap_updated: false,
+      created_by: currentUser.id
     };
 
 
     const { error } = await supabase
       .from('cutting_jobs')
-      .insert(payload);
+      .insert(normalize(payload));
 
     if (error) {
       console.error('Create job failed:', error);
@@ -768,8 +781,8 @@ export function CreateCuttingJob() {
                   </label>
                   <select
                     required
-                    value={formData.supervisor_id}
-                    onChange={(e) => setFormData({ ...formData, supervisor_id: e.target.value })}
+                    value={formData.supervisor_id ?? ''}
+                    onChange={(e) => setFormData({ ...formData, supervisor_id: e.target.value || null })}
                     className="w-full px-4 py-3 lg:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select supervisor...</option>
@@ -788,8 +801,8 @@ export function CreateCuttingJob() {
                   </label>
                   <select
                     required
-                    value={formData.machine_id}
-                    onChange={(e) => setFormData({ ...formData, machine_id: e.target.value })}
+                    value={formData.machine_id ?? ''}
+                    onChange={(e) => setFormData({ ...formData, machine_id: e.target.value || null})}
                     className="w-full px-4 py-3 lg:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select machine...</option>
@@ -846,8 +859,8 @@ export function CreateCuttingJob() {
                   </label>
                   <select
                     required
-                    value={formData.material_id}
-                    onChange={(e) => setFormData({ ...formData, material_id: e.target.value })}
+                    value={formData.material_id ?? ''}
+                    onChange={(e) => setFormData({ ...formData, material_id: e.target.value || null })}
                     className="w-full px-4 py-3 lg:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select raw material...</option>
