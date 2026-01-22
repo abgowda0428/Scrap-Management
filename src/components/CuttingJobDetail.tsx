@@ -8,7 +8,9 @@ interface Props {
   onBack: () => void;
 }
 
-export function CuttingJobDetail({ job, onBack }: Props) {
+export function CuttingJobDetail({ job, onBack }) 
+{
+  console.log('JOB DETAIL DATA:', job);
   const [operationData, setOperationData] = useState({
     input_length: '',
     input_weight: '',
@@ -117,6 +119,40 @@ export function CuttingJobDetail({ job, onBack }: Props) {
           <div className="bg-white rounded-lg shadow p-4 lg:p-6 lg:sticky lg:top-6">
             <h2 className="mb-4">Job Details</h2>
             <div className="space-y-3">
+              <div>
+  <p className="text-sm text-gray-600">Job Date</p>
+  <p className="text-gray-900">{job.job_date}</p>
+</div>
+
+<div>
+  <p className="text-sm text-gray-600">Shift</p>
+  <p className="text-gray-900">{job.shift}</p>
+</div>
+
+<div>
+  <p className="text-sm text-gray-600">RM Batch No</p>
+  <p className="text-gray-900">{job.rm_batch_no || '-'}</p>
+</div>
+
+<div>
+  <p className="text-sm text-gray-600">Master Serial No</p>
+  <p className="text-gray-900">{job.fg_code || '-'}</p>
+</div>
+
+<div>
+  <p className="text-sm text-gray-600">Remarks</p>
+  <p className="text-gray-900">{job.notes || '-'}</p>
+</div>
+<div>
+  <p className="text-sm text-gray-600">Supervisor</p>
+  <p className="text-gray-900">
+    {job.supervisor_name || (
+      <span className="italic text-gray-400">-</span>  // supervisor name missing (backend data issue)
+    )}
+  </p>
+</div>
+
+
               <div>
                 <p className="text-sm text-gray-600">Job Order No.</p>
                 <p className="text-gray-900">{job.job_order_no}</p>
