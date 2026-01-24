@@ -2,6 +2,12 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X, Users, Search, UserCheck, UserX } from 'lucide-react';
 import { supabase } from '../src//config/supabase';
+import { Eye, EyeOff } from 'lucide-react';
+
+
+
+
+
 
 
 type UserRole = 'OPERATOR' | 'SUPERVISOR' | 'MANAGER' | 'ADMIN';
@@ -21,6 +27,8 @@ interface UserFormData {
 }
 
 export  function UserManagementEnhanced() {
+
+  const [showPassword, setShowPassword] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState<any[]>([]);
@@ -353,7 +361,16 @@ export  function UserManagementEnhanced() {
 
       {/* User Form Modal - NEW IMPROVED VERSION */}
       {isFormOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div
+  className="
+    fixed inset-0 z-50
+    flex items-center justify-center p-4
+    bg-gray-900/60
+    backdrop-blur-sm
+    transition-opacity
+  "
+>
+
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900">
@@ -428,16 +445,40 @@ export  function UserManagementEnhanced() {
                 {!editingUser && (
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Temporary Password *
+                      User Password *
                     </label>
-                    <input
-                      type="password"
-                      required={!editingUser}
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="User will change on first login"
-                    />
+                    <div className="relative">
+  <input
+    type={showPassword ? 'text' : 'password'}
+    required={!editingUser}
+    value={formData.password}
+    onChange={(e) =>
+      setFormData({ ...formData, password: e.target.value })
+    }
+    className="
+      w-full px-4 py-2 pr-12
+      border border-gray-300 rounded-lg
+      focus:outline-none focus:ring-2 focus:ring-blue-500
+    "
+    placeholder="Password will remain unchanged after login"
+  />
+
+  <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="
+      absolute right-3 top-1/2 -translate-y-1/2
+      text-gray-500 hover:text-gray-700
+    "
+  >
+    {showPassword ? (
+      <EyeOff className="w-5 h-5" />
+    ) : (
+      <Eye className="w-5 h-5" />
+    )}
+  </button>
+</div>
+
                   </div>
                 )}
 
