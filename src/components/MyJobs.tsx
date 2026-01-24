@@ -2522,85 +2522,14 @@ export function MyJobs() {
 {expandedJobId === job.id && (
   <div className="mt-6 border-t pt-6 space-y-6">
 
-    METRICS ROW
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-      <div>
-        <p className="text-gray-500">Output</p>
-        <p className="font-medium">48 / {job.planned_output_qty}</p>
-      </div>
 
-      <div>
-        <p className="text-gray-500">Scrap Wt</p>
-        <p className="font-medium">9.0 kg</p>
-      </div>
-
-      <div>
-        <p className="text-gray-500">Scrap %</p>
-        <p className="font-medium text-green-600">3.6%</p>
-      </div>
-
-      <div>
-        <p className="text-gray-500">End Pcs</p>
-        <p className="font-medium">2.5 kg</p>
-      </div>
-
-      <div>
-        <p className="text-gray-500">Efficiency</p>
-        <p className="font-medium text-green-600">94%</p>
-      </div>
-    </div>
-
-    {/* CUT PIECES MOVEMENT */}
-    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-      <p className="font-medium text-purple-800 mb-3">
-        ✂ Cut Pieces Movement
-      </p>
-
-      <div className="grid grid-cols-4 gap-4 text-center text-sm">
-        <div>
-          <p className="text-gray-500">Total</p>
-          <p className="text-lg font-semibold">8</p>
-        </div>
-
-        <div>
-          <p className="text-gray-500">Available</p>
-          <p className="text-lg font-semibold text-green-600">2</p>
-        </div>
-
-        <div>
-          <p className="text-gray-500">Moved</p>
-          <p className="text-lg font-semibold text-blue-600">6</p>
-        </div>
-
-        <div>
-          <p className="text-gray-500">Progress</p>
-          <p className="text-lg font-semibold text-orange-600">75%</p>
-        </div>
-      </div>
-
-      {/* PROGRESS BAR */}
-      <div className="mt-4">
-        <div className="flex justify-between text-xs text-gray-600 mb-1">
-          <span>To Next Operations</span>
-          <span>6 / 8</span>
-        </div>
-
-        <div className="h-2 bg-purple-200 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-purple-600 rounded-full transition-all duration-500"
-            style={{ width: '75%' }}
-          />
-        </div>
-      </div>
-    </div>
-
-    {/* NOTES */}
+    {/* NOTES
     <div className="text-sm">
       <span className="text-gray-500">Notes:</span>{' '}
       <span className="text-gray-700">
         {job.remarks || '—'}
       </span>
-    </div>
+    </div> */}
   </div>
 )}
 
