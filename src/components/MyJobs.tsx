@@ -641,20 +641,1680 @@
 //   );
 // }
 
-//prajeeth
+//prajeeth-in-progress
+
+
 
 // import { useState, useEffect, useMemo } from 'react';
 
-import { useState, useEffect, useMemo } from 'react';
+// import {
+//   Eye,
+//   Clock,
+//   Play,
+//   XCircle,
+//   AlertTriangle,
+//   ArrowLeft,
+//   CheckCircle,
+// } from 'lucide-react';
 
+// import { useApp } from '../context/AppContext';
+// import { supabase } from '../src/config/supabase';
+// import { CuttingJobDetail } from './CuttingJobDetail';
+
+// export function MyJobs() {
+//   const { currentUser, setCurrentScreen } = useApp();
+
+//   // Safety guard – DO NOT CHANGE
+//   if (!currentUser) {
+//     return <div className="p-6">Loading user…</div>;
+//   }
+
+//   /* ---------------- STATE (UNCHANGED) ---------------- */
+//   const [jobs, setJobs] = useState<any[]>([]);
+//   const [filterStatus, setFilterStatus] = useState<
+//     'ALL' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+//   >('ALL');
+
+//   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+//   const [cancelJobId, setCancelJobId] = useState<string | null>(null);
+//   const [cancelReason, setCancelReason] = useState('');
+
+//   /* ---------------- ROLE LOGIC (UNCHANGED) ---------------- */
+//   const isOperator = currentUser.role === 'OPERATOR';
+//   const isSupervisor = currentUser.role !== 'OPERATOR';
+
+//   /* ---------------- FETCH JOBS (UNCHANGED) ---------------- */
+//   useEffect(() => {
+//     const fetchJobs = async () => {
+//       const { data, error } = await supabase
+//         .from('my_jobs_view')
+//         .select('*')
+//         .order('job_date', { ascending: false });
+
+//       if (error) {
+//         console.error('Failed to fetch jobs:', error);
+//         return;
+//       }
+
+//       setJobs(data || []);
+//     };
+
+//     fetchJobs();
+//   }, []);
+
+//   /* ---------------- FILTER LOGIC (UNCHANGED) ---------------- */
+//   const filteredJobs = useMemo(() => {
+//     return jobs.filter(job => {
+//       if (isOperator && job.operator_id !== currentUser.id) return false;
+//       if (filterStatus !== 'ALL' && job.status !== filterStatus) return false;
+//       return true;
+//     });
+//   }, [jobs, filterStatus, isOperator, currentUser]);
+
+//   /* ---------------- CANCEL HANDLER (UNCHANGED) ---------------- */
+//   const handleCancelJob = async () => {
+//     if (!cancelReason.trim()) {
+//       alert('Please provide a reason for cancellation');
+//       return;
+//     }
+
+//     try {
+//       await supabase
+//         .from('cutting_jobs')
+//         .update({
+//           status: 'CANCELLED',
+//           cancel_reason: cancelReason,
+//         })
+//         .eq('id', cancelJobId);
+
+//       setJobs(prev =>
+//         prev.map(j =>
+//           j.id === cancelJobId ? { ...j, status: 'CANCELLED' } : j
+//         )
+//       );
+
+//       setCancelJobId(null);
+//       setCancelReason('');
+//     } catch (error) {
+//       console.error('Cancel job failed:', error);
+//       alert('Failed to cancel job');
+//     }
+//   };
+
+//   /* ---------------- JOB DETAIL VIEW (UNCHANGED) ---------------- */
+//   if (selectedJob) {
+//     const job = jobs.find(j => j.id === selectedJob);
+//     if (job) {
+//       return (
+//         <CuttingJobDetail
+//           job={job}
+//           onBack={() => setSelectedJob(null)}
+//         />
+//       );
+//     }
+//   }
+
+//   return (
+//     <div className="overflow-hidden">
+
+//       {/* ================= CANCEL MODAL (UNCHANGED) ================= */}
+//       {cancelJobId && (
+//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+//           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+//             <h3 className="text-gray-900 mb-2">Cancel Job Order</h3>
+
+//             <textarea
+//               value={cancelReason}
+//               onChange={e => setCancelReason(e.target.value)}
+//               className="w-full px-4 py-3 border rounded-lg"
+//               rows={4}
+//               placeholder="Provide reason for cancelling this job order..."
+//             />
+
+//             <div className="flex gap-3 mt-4">
+//               <button
+//                 onClick={handleCancelJob}
+//                 className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg"
+//               >
+//                 Confirm Cancellation
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setCancelJobId(null);
+//                   setCancelReason('');
+//                 }}
+//                 className="px-4 py-2 border rounded-lg"
+//               >
+//                 Close
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* ================= HEADER ================= */}
+//       <div className="mb-6">
+//         <div className="flex items-center gap-3 mb-4">
+//           <button
+//             onClick={() => setCurrentScreen('dashboard')}
+//             className="p-2 hover:bg-gray-100 rounded-lg"
+//           >
+//             <ArrowLeft className="w-5 h-5" />
+//           </button>
+
+//           <div>
+//             <h1 className="text-2xl text-gray-900">
+//               {isOperator ? 'My Jobs' : 'All Cutting Jobs'}
+//             </h1>
+//             <p className="text-sm text-gray-600">
+//               {filteredJobs.length} job(s) found
+//             </p>
+//           </div>
+//         </div>
+
+//         {/* FILTER TABS (UNCHANGED) */}
+//         <div className="flex gap-2">
+//           {['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map(status => (
+//             <button
+//               key={status}
+//               onClick={() => setFilterStatus(status as any)}
+//               className={`px-4 py-2 rounded-lg text-sm ${
+//                 filterStatus === status
+//                   ? status === 'CANCELLED'
+//                     ? 'bg-red-600 text-white'
+//                     : 'bg-blue-600 text-white'
+//                   : 'bg-white border'
+//               }`}
+//             >
+//               {status.replace('_', ' ')}
+//             </button>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* ================= JOB LIST ================= */}
+//       <div className="space-y-4">
+//         {filteredJobs.map(job => (
+//           <div key={job.id} className="bg-white rounded-lg shadow p-6">
+
+//             {/* ===== CARD LAYOUT (ALIGNMENT ONLY) ===== */}
+//             <div className="flex justify-between gap-6">
+
+//               {/* -------- LEFT : JOB INFO -------- */}
+//               <div className="flex-1">
+//                 <h2 className="text-xl text-gray-900">{job.job_order_no}</h2>
+//                 <StatusBadge status={job.status} />
+
+//                 <p className="text-sm text-gray-600 mt-2">
+//                   {job.material_code} • {job.machine_name}
+//                 </p>
+
+//                 <p className="text-sm text-gray-600 mt-1">
+//                   Operator:{' '}
+//                   <span className="text-gray-900 font-medium">
+//                     {job.operator_name || '-'}
+//                   </span>
+//                 </p>
+
+//                 {/* MASTER JOB DETAILS – SHOWN FOR ALL STATES */}
+//                 {['PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].includes(job.status) && (
+//                   <div className="mt-2 space-y-1 text-sm">
+//                     <p>
+//                       Supervisor:{' '}
+//                       <strong>{job.supervisor_name || '-'}</strong>
+//                     </p>
+//                     <p>
+//                       Planned Qty:{' '}
+//                       <strong>{job.planned_output_qty ?? '-'} pcs</strong>
+//                     </p>
+//                     <p>
+//                       Master Serial No:{' '}
+//                       <strong>{job.fg_code || '-'}</strong>
+//                     </p>
+//                   </div>
+//                 )}
+//               </div>
+
+//               {/* -------- RIGHT : ACTIONS -------- */}
+//               <div className="flex flex-col items-end gap-3 min-w-[200px]">
+
+//                 {/* Eye icon */}
+//                 <button
+//                   onClick={() => setSelectedJob(job.id)}
+//                   className="p-2 hover:bg-gray-100 rounded-lg"
+//                 >
+//                   <Eye />
+//                 </button>
+
+//                 {/* Start / Continue */}
+//                 {job.status === 'PLANNED' && (
+//                   <button
+//                     onClick={async () => {
+//                       await supabase
+//                         .from('cutting_jobs')
+//                         .update({ status: 'IN_PROGRESS' })
+//                         .eq('id', job.id);
+
+//                       setJobs(prev =>
+//                         prev.map(j =>
+//                           j.id === job.id ? { ...j, status: 'IN_PROGRESS' } : j
+//                         )
+//                       );
+//                     }}
+//                     className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+//                   >
+//                     <Play className="w-4 h-4" />
+//                     Start Job
+//                   </button>
+//                 )}
+
+//                 {job.status === 'IN_PROGRESS' && (
+//                   <button
+//                     onClick={() => {
+//                       setSelectedJob(job.id);
+//                       setCurrentScreen('cutting-operation');
+//                     }}
+//                     className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+//                   >
+//                     <Play className="w-4 h-4" />
+//                     Continue
+//                   </button>
+//                 )}
+
+//                 {/* Cancel */}
+//                 {isSupervisor &&
+//                   (job.status === 'PLANNED' || job.status === 'IN_PROGRESS') && (
+//                     <button
+//                       onClick={() => setCancelJobId(job.id)}
+//                       className="bg-red-50 text-red-600 border px-4 py-2 rounded-lg"
+//                     >
+//                       Cancel Job
+//                     </button>
+//                   )}
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }
+
+// /* ================= STATUS BADGE ================= */
+// function StatusBadge({ status }: { status: string }) {
+//   const map: any = {
+//     PLANNED: ['Planned', 'bg-gray-100 text-gray-800', Clock],
+//     IN_PROGRESS: ['In Progress', 'bg-blue-100 text-blue-800', Play],
+//     COMPLETED: ['Completed', 'bg-green-100 text-green-800', CheckCircle],
+//     CANCELLED: ['Cancelled', 'bg-red-100 text-red-800', XCircle],
+//   };
+
+//   const [label, cls, Icon] = map[status];
+
+//   return (
+//     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${cls}`}>
+//       <Icon className="w-3 h-3" />
+//       {label}
+//     </span>
+//   );
+// }
+// PRAJEETH <IN-PROGRSS> CONTINUE
+// import { useState, useEffect, useMemo } from 'react';
+
+// import {
+//   Eye,
+//   Clock,
+//   Play,
+//   XCircle,
+//   AlertTriangle,
+//   ArrowLeft,
+//   CheckCircle,
+// } from 'lucide-react';
+
+// import { useApp } from '../context/AppContext';
+// import { supabase } from '../src/config/supabase';
+// import { CuttingJobDetail } from './CuttingJobDetail';
+// import { ChevronDown, ChevronUp } from 'lucide-react';
+
+
+// export function MyJobs() {
+//   const { currentUser, setCurrentScreen } = useApp();
+
+//   // Safety guard – DO NOT CHANGE
+//   if (!currentUser) {
+//     return <div className="p-6">Loading user…</div>;
+//   }
+
+//   /* ---------------- STATE (UNCHANGED) ---------------- */
+//   const [jobs, setJobs] = useState<any[]>([]);
+//   const [filterStatus, setFilterStatus] = useState<
+//     'ALL' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+//   >('ALL');
+
+//   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+//   const [cancelJobId, setCancelJobId] = useState<string | null>(null);
+//   const [cancelReason, setCancelReason] = useState('');
+
+//   /* ---------------- ROLE LOGIC (UNCHANGED) ---------------- */
+//   const isOperator = currentUser.role === 'OPERATOR';
+//   const isSupervisor = currentUser.role !== 'OPERATOR';
+
+//   /* ---------------- FETCH JOBS (UNCHANGED) ---------------- */
+//   useEffect(() => {
+//     const fetchJobs = async () => {
+//       const { data, error } = await supabase
+//         .from('my_jobs_view')
+//         .select('*')
+//         .order('job_date', { ascending: false });
+
+//       if (error) {
+//         console.error('Failed to fetch jobs:', error);
+//         return;
+//       }
+
+//       setJobs(data || []);
+//     };
+
+//     fetchJobs();
+//   }, []);
+
+//   /* ---------------- FILTER LOGIC (UNCHANGED) ---------------- */
+//   const filteredJobs = useMemo(() => {
+//     return jobs.filter(job => {
+//       if (isOperator && job.operator_id !== currentUser.id) return false;
+//       if (filterStatus !== 'ALL' && job.status !== filterStatus) return false;
+//       return true;
+//     });
+//   }, [jobs, filterStatus, isOperator, currentUser]);
+
+//   /* ---------------- CANCEL HANDLER (UNCHANGED) ---------------- */
+//   const handleCancelJob = async () => {
+//     if (!cancelReason.trim()) {
+//       alert('Please provide a reason for cancellation');
+//       return;
+//     }
+
+//     try {
+//       await supabase
+//         .from('cutting_jobs')
+//         .update({
+//           status: 'CANCELLED',
+//           cancel_reason: cancelReason,
+//         })
+//         .eq('id', cancelJobId);
+
+//       setJobs(prev =>
+//         prev.map(j =>
+//           j.id === cancelJobId ? { ...j, status: 'CANCELLED' } : j
+//         )
+//       );
+
+//       setCancelJobId(null);
+//       setCancelReason('');
+//     } catch (error) {
+//       console.error('Cancel job failed:', error);
+//       alert('Failed to cancel job');
+//     }
+//   };
+
+//   /* ---------------- JOB DETAIL VIEW (UNCHANGED) ---------------- */
+//   if (selectedJob) {
+//     const job = jobs.find(j => j.id === selectedJob);
+//     if (job) {
+//       return (
+//         <CuttingJobDetail
+//           job={job}
+//           onBack={() => setSelectedJob(null)}
+//         />
+//       );
+//     }
+//   }
+
+//   return (
+//     <div className="overflow-hidden">
+
+//       {/* ================= CANCEL MODAL (UNCHANGED) ================= */}
+//       {cancelJobId && (
+//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+//           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+//             <h3 className="text-gray-900 mb-2">Cancel Job Order</h3>
+
+//             <textarea
+//               value={cancelReason}
+//               onChange={e => setCancelReason(e.target.value)}
+//               className="w-full px-4 py-3 border rounded-lg"
+//               rows={4}
+//               placeholder="Provide reason for cancelling this job order..."
+//             />
+
+//             <div className="flex gap-3 mt-4">
+//               <button
+//                 onClick={handleCancelJob}
+//                 className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg"
+//               >
+//                 Confirm Cancellation
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setCancelJobId(null);
+//                   setCancelReason('');
+//                 }}
+//                 className="px-4 py-2 border rounded-lg"
+//               >
+//                 Close
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* ================= HEADER ================= */}
+//       <div className="mb-6">
+//         <div className="flex items-center gap-3 mb-4">
+//           <button
+//             onClick={() => setCurrentScreen('dashboard')}
+//             className="p-2 hover:bg-gray-100 rounded-lg"
+//           >
+//             <ArrowLeft className="w-5 h-5" />
+//           </button>
+
+//           <div>
+//             <h1 className="text-2xl text-gray-900">
+//               {isOperator ? 'My Jobs' : 'All Cutting Jobs'}
+//             </h1>
+//             <p className="text-sm text-gray-600">
+//               {filteredJobs.length} job(s) found
+//             </p>
+//           </div>
+//         </div>
+
+//         {/* FILTER TABS (UNCHANGED) */}
+//         <div className="flex gap-2">
+//           {['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map(status => (
+//             <button
+//               key={status}
+//               onClick={() => setFilterStatus(status as any)}
+//               className={`px-4 py-2 rounded-lg text-sm ${
+//                 filterStatus === status
+//                   ? status === 'CANCELLED'
+//                     ? 'bg-red-600 text-white'
+//                     : 'bg-blue-600 text-white'
+//                   : 'bg-white border'
+//               }`}
+//             >
+//               {status.replace('_', ' ')}
+//             </button>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* ================= JOB LIST ================= */}
+//       <div className="space-y-4">
+//         {filteredJobs.map(job => (
+//           <div key={job.id} className="bg-white rounded-lg shadow p-6">
+
+//             {/* ===== CARD LAYOUT (ALIGNMENT ONLY) ===== */}
+//             <div className="flex justify-between gap-6">
+
+//               {/* -------- LEFT : JOB INFO -------- */}
+//               <div className="flex-1">
+//                 <h2 className="text-xl text-gray-900">{job.job_order_no}</h2>
+//                 <StatusBadge status={job.status} />
+
+//                 <p className="text-sm text-gray-600 mt-2">
+//                   {job.material_code} • {job.machine_name}
+//                 </p>
+
+//                 <p className="text-sm text-gray-00 mt-2">
+//                   Operator:{' '}
+//                   <span className="text-sm text-gray-600 mt-1">
+//                     {job.operator_name || '-'}
+//                   </span>
+//                 </p>
+
+//                 {/* MASTER JOB DETAILS – SHOWN FOR ALL STATES */}
+//                 <p className="text-sm text-gray-00 mt-2">
+//   Supervisor:{' '}
+//   <span className="text-sm text-gray-600 mt-1">
+//     {job.supervisor_name || '-'}
+//   </span>
+// </p>
+
+// <p className="text-sm text-gray-00 mt-2">
+//   Planned Qty:{' '}
+//   <span className="text-sm text-gray-600 mt-1">
+//     {job.planned_output_qty ?? '-'} pcs
+//   </span>
+// </p>
+
+// <p className="text-sm text-gray-00 mt-2">
+//   Master Serial No:{' '}
+//   <span className="text-sm text-gray-600 mt-1">
+//     {job.fg_code || '-'}
+//   </span>
+// </p>
+
+//               </div>
+
+//               {/* -------- RIGHT : ACTIONS -------- */}
+//               <div className="flex flex-col items-end gap-3 min-w-[200px]">
+
+//                 {/* Eye icon */}
+//                 <button
+//                   onClick={() => setSelectedJob(job.id)}
+//                   className="p-2 hover:bg-gray-100 rounded-lg"
+//                 >
+//                   <Eye />
+//                 </button>
+
+//                 {/* Start Job – PLANNED */}
+                
+
+// {/* Start Job – only when PLANNED */}
+// {job.status === 'PLANNED' && (
+//   <button
+//     onClick={async () => {
+//       await supabase
+//         .from('cutting_jobs')
+//         .update({ status: 'IN_PROGRESS' })
+//         .eq('id', job.id);
+
+//       setJobs(prev =>
+//         prev.map(j =>
+//           j.id === job.id ? { ...j, status: 'IN_PROGRESS' } : j
+//         )
+//       );
+//     }}
+//     className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+//   >
+//     <Play className="w-4 h-4" />
+//     Start Job
+//   </button>
+// )}
+
+// {/* Continue Job – only when IN_PROGRESS */}
+// {job.status === 'IN_PROGRESS' && (
+//   <button
+//     onClick={() => {
+//       setSelectedJob(job.id);
+//       setCurrentScreen('cutting-operation');
+//     }}
+//     className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+//   >
+//     <Play className="w-4 h-4" />
+//     Continue Job
+//   </button>
+// )}
+
+
+// {/* Continue Job – IN_PROGRESS */}
+// {/* {job.status === 'IN_PROGRESS' && ( prajeeth
+//   <button
+//     onClick={() => {
+//       setSelectedJob(job.id);
+//       setCurrentScreen('cutting-operation');
+//     }}
+//     className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+//   >
+//     <Play className="w-4 h-4" />
+//     Continue Job
+//   </button>
+// )} */}
+// {/* {job.status?.toUpperCase().replace(' ', '_') === 'IN_PROGRESS' && (
+//   <button
+//     onClick={() => {
+//       setSelectedJob(job.id);
+//       setCurrentScreen('cutting-operation');
+//     }}
+//     className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+//   >
+//     <Play className="w-4 h-4" />
+//     Continue Job
+//   </button>
+// )}
+//  */}
+
+
+                
+//                 {/* Cancel */}
+//                 {isSupervisor &&
+//                   (job.status === 'PLANNED' || job.status === 'IN_PROGRESS') && (
+//                     <button
+//                       onClick={() => setCancelJobId(job.id)}
+//                       className="bg-red-50 text-red-600 border px-4 py-2 rounded-lg"
+//                     >
+//                       Cancel Job
+//                     </button>
+//                   )}
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }
+
+// /* ================= STATUS BADGE ================= */
+// function StatusBadge({ status }: { status: string }) {
+//   const map: any = {
+//     PLANNED: ['Planned', 'bg-gray-100 text-gray-800', Clock],
+//     IN_PROGRESS: ['In Progress', 'bg-blue-100 text-blue-800', Play],
+//     COMPLETED: ['Completed', 'bg-green-100 text-green-800', CheckCircle],
+//     CANCELLED: ['Cancelled', 'bg-red-100 text-red-800', XCircle],
+//   };
+
+//   const [label, cls, Icon] = map[status];
+  
+
+//   return (
+//     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${cls}`}>
+//       <Icon className="w-3 h-3" />
+//       {label}
+//     </span>
+//   );
+// }
+
+
+// dropdown expand collapse job details
+  // import { useState, useEffect, useMemo } from 'react';
+  // import {
+  //   Eye,
+  //   Clock,
+  //   Play,
+  //   XCircle,
+  //   ArrowLeft,
+  //   CheckCircle,
+  //   ChevronDown,
+  //   ChevronUp,
+  // } from 'lucide-react';
+
+  // import { useApp } from '../context/AppContext';
+  // import { supabase } from '../src/config/supabase';
+  // import { CuttingJobDetail } from './CuttingJobDetail';
+
+  // export function MyJobs() {
+  //   const { currentUser, setCurrentScreen } = useApp();
+
+  //   if (!currentUser) {
+  //     return <div className="p-6">Loading user…</div>;
+  //   }
+
+  //   const [jobs, setJobs] = useState<any[]>([]);
+  //   const [filterStatus, setFilterStatus] = useState<
+  //     'ALL' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+  //   >('ALL');
+
+  //   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  //   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+
+  //   const isOperator = currentUser.role === 'OPERATOR';
+  //   const isSupervisor = currentUser.role !== 'OPERATOR';
+
+  //   /* ================= FETCH JOBS ================= */
+  //   useEffect(() => {
+  //     const fetchJobs = async () => {
+  //       const { data } = await supabase
+  //         .from('my_jobs_view')
+  //         .select('*')
+  //         .order('job_date', { ascending: false });
+
+  //       setJobs(data || []);
+  //     };
+
+  //     fetchJobs();
+  //   }, []);
+
+  //   /* ================= FILTER ================= */
+  //   const filteredJobs = useMemo(() => {
+  //     return jobs.filter(job => {
+  //       if (isOperator && job.operator_id !== currentUser.id) return false;
+  //       if (filterStatus !== 'ALL' && job.status !== filterStatus) return false;
+  //       return true;
+  //     });
+  //   }, [jobs, filterStatus, isOperator, currentUser]);
+
+  //   /* ================= DETAIL VIEW ================= */
+  //   if (selectedJob) {
+  //     const job = jobs.find(j => j.id === selectedJob);
+  //     if (job) {
+  //       return <CuttingJobDetail job={job} onBack={() => setSelectedJob(null)} />;
+  //     }
+  //   }
+
+  //   return (
+  //     <div className="overflow-hidden">
+  //       {/* HEADER */}
+  //       <div className="mb-6">
+  //         <div className="flex items-center gap-3 mb-4">
+  //           <button
+  //             onClick={() => setCurrentScreen('dashboard')}
+  //             className="p-2 hover:bg-gray-100 rounded-lg"
+  //           >
+  //             <ArrowLeft className="w-5 h-5" />
+  //           </button>
+
+  //           <div>
+  //             <h1 className="text-2xl text-gray-900">
+  //               {isOperator ? 'My Jobs' : 'All Cutting Jobs'}
+  //             </h1>
+  //             <p className="text-sm text-gray-600">
+  //               {filteredJobs.length} job(s) found
+  //             </p>
+  //           </div>
+  //         </div>
+
+  //         <div className="flex gap-2">
+  //           {['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map(s => (
+  //             <button
+  //               key={s}
+  //               onClick={() => setFilterStatus(s as any)}
+  //               className={`px-4 py-2 rounded-lg text-sm ${
+  //                 filterStatus === s
+  //                   ? s === 'CANCELLED'
+  //                     ? 'bg-red-600 text-white'
+  //                     : 'bg-blue-600 text-white'
+  //                   : 'bg-white border'
+  //               }`}
+  //             >
+  //               {s.replace('_', ' ')}
+  //             </button>
+  //           ))}
+  //         </div>
+  //       </div>
+
+  //       {/* JOB LIST */}
+  //       <div className="space-y-4">
+  //         {filteredJobs.map(job => {
+  //           const isExpanded = expandedJobId === job.id;
+
+  //           return (
+  //             <div key={job.id} className="bg-white rounded-lg shadow p-6">
+  //               {/* MAIN ROW */}
+  //               <div className="flex justify-between gap-6">
+  //                 {/* LEFT */}
+  //                 <div className="flex-1">
+  //                   <h2 className="text-xl text-gray-900">{job.job_order_no}</h2>
+  //                   <StatusBadge status={job.status} />
+
+  //                   <p className="text-sm text-gray-600 mt-2">
+  //                     {job.material_code} • {job.machine_name}
+  //                   </p>
+
+  //                   <p className="text-sm mt-2">
+  //                     Operator:{' '}
+  //                     <span className="text-gray-600">
+  //                       {job.operator_name || '-'}
+  //                     </span>
+  //                   </p>
+
+  //                   <p className="text-sm mt-2">
+  //                     Supervisor:{' '}
+  //                     <span className="text-gray-600">
+  //                       {job.supervisor_name || '-'}
+  //                     </span>
+  //                   </p>
+
+  //                   <p className="text-sm mt-2">
+  //                     Planned Qty:{' '}
+  //                     <span className="text-gray-600">
+  //                       {job.planned_output_qty} pcs
+  //                     </span>
+  //                   </p>
+
+  //                   <p className="text-sm mt-2">
+  //                     Master Serial No:{' '}
+  //                     <span className="text-gray-600">
+  //                       {job.fg_code || '-'}
+  //                     </span>
+  //                   </p>
+
+  //                   {/* EXPANDED CONTENT */}
+  //                   {isExpanded && (
+  //                     <div className="mt-4 border-t pt-4 text-sm text-gray-700 space-y-2">
+  //                       <p>Job Date: {job.job_date}</p>
+  //                       <p>Shift: {job.shift}</p>
+  //                       <p>RM Batch No: {job.rm_batch_no}</p>
+  //                       <p>Remarks: {job.remarks || '-'}</p>
+  //                     </div>
+  //                   )}
+  //                 </div>
+
+  //                 {/* RIGHT ACTIONS */}
+  //                 <div className="flex flex-col items-end gap-3 min-w-[200px]">
+  //                   <button
+  //                     onClick={() => setSelectedJob(job.id)}
+  //                     className="p-2 hover:bg-gray-100 rounded-lg"
+  //                   >
+  //                     <Eye />
+  //                   </button>
+
+  //                   {job.status === 'PLANNED' && (
+  //                     <button
+  //                       onClick={async () => {
+  //                         await supabase
+  //                           .from('cutting_jobs')
+  //                           .update({ status: 'IN_PROGRESS' })
+  //                           .eq('id', job.id);
+
+  //                         setJobs(prev =>
+  //                           prev.map(j =>
+  //                             j.id === job.id
+  //                               ? { ...j, status: 'IN_PROGRESS' }
+  //                               : j
+  //                           )
+  //                         );
+  //                       }}
+  //                       className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+  //                     >
+  //                       <Play className="w-4 h-4" />
+  //                       Start Job
+  //                     </button>
+  //                   )}
+
+  //                   {job.status === 'IN_PROGRESS' && (
+  //                     <button
+  //                       onClick={() => setSelectedJob(job.id)}
+  //                       className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+  //                     >
+  //                       <Play className="w-4 h-4" />
+  //                       Continue Job
+  //                     </button>
+  //                   )}
+
+  //                   {isSupervisor &&
+  //                     (job.status === 'PLANNED' ||
+  //                       job.status === 'IN_PROGRESS') && (
+  //                       <button className="bg-red-50 text-red-600 border px-4 py-2 rounded-lg">
+  //                         Cancel Job
+  //                       </button>
+  //                     )}
+  //                 </div>
+  //               </div>
+
+  //               {/* FOOTER EXPAND BUTTON (CORRECT POSITION) */}
+  //               <div className="mt-4 flex justify-center">
+  //                 <button
+  //                   onClick={() =>
+  //                     setExpandedJobId(isExpanded ? null : job.id)
+  //                   }
+  //                   className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full"
+  //                 >
+  //                   {isExpanded ? <ChevronUp /> : <ChevronDown />}
+  //                 </button>
+  //               </div>
+  //             </div>
+  //           );
+  //         })}
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  // /* STATUS BADGE */
+  // function StatusBadge({ status }: { status: string }) {
+  //   const map: any = {
+  //     PLANNED: ['Planned', 'bg-gray-100 text-gray-800', Clock],
+  //     IN_PROGRESS: ['In Progress', 'bg-blue-100 text-blue-800', Play],
+  //     COMPLETED: ['Completed', 'bg-green-100 text-green-800', CheckCircle],
+  //     CANCELLED: ['Cancelled', 'bg-red-100 text-red-800', XCircle],
+  //   };
+
+  //   const [label, cls, Icon] = map[status];
+
+  //   return (
+  //     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${cls}`}>
+  //       <Icon className="w-3 h-3" />
+  //       {label}
+  //     </span>
+  //   );
+  // }
+/* ---------------- ROLE LOGIC (UNCHANGED) ---------------- */
+// import { RotateCcw } from 'lucide-react';
+
+// import { useState, useEffect, useMemo } from 'react';
+// import {
+//   Eye,
+//   Clock,
+//   Play,
+//   XCircle,
+//   ArrowLeft,
+//   CheckCircle,
+//   ChevronDown,
+//   ChevronUp,
+// } from 'lucide-react';
+
+// import { useApp } from '../context/AppContext';
+// import { supabase } from '../src/config/supabase';
+// import { CuttingJobDetail } from './CuttingJobDetail';
+
+// export function MyJobs() {
+//   const { currentUser, setCurrentScreen } = useApp();
+
+//   if (!currentUser) {
+//     return <div className="p-6">Loading user…</div>;
+//   }
+
+//   /* ---------------- STATE ---------------- */
+//   const [jobs, setJobs] = useState<any[]>([]);
+//   const [filterStatus, setFilterStatus] = useState<
+//     'ALL' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+//   >('ALL');
+
+//   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+//   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+
+//   // CANCEL STATE
+//   const [cancelJobId, setCancelJobId] = useState<string | null>(null);
+//   const [cancelReason, setCancelReason] = useState('');
+
+//   const isOperator = currentUser.role === 'OPERATOR';
+//   const isSupervisor = currentUser.role !== 'OPERATOR';
+
+//   /* ---------------- FETCH ---------------- */
+//   useEffect(() => {
+//     const fetchJobs = async () => {
+//       const { data } = await supabase
+//         .from('my_jobs_view')
+//         .select('*')
+//         .order('job_date', { ascending: false });
+
+//       setJobs(data || []);
+//     };
+
+//     fetchJobs();
+//   }, []);
+
+//   /* ---------------- FILTER ---------------- */
+//   const filteredJobs = useMemo(() => {
+//     return jobs.filter(job => {
+//       if (isOperator && job.operator_id !== currentUser.id) return false;
+//       if (filterStatus !== 'ALL' && job.status !== filterStatus) return false;
+//       return true;
+//     });
+//   }, [jobs, filterStatus, isOperator, currentUser]);
+
+//   /* ---------------- CANCEL HANDLER ---------------- */
+//   const handleCancelJob = async () => {
+//     if (!cancelReason.trim()) {
+//       alert('Please provide a reason');
+//       return;
+//     }
+
+//     await supabase
+//       .from('cutting_jobs')
+//       .update({
+//         status: 'CANCELLED',
+//         cancel_reason: cancelReason,
+//       })
+//       .eq('id', cancelJobId);
+
+//     setJobs(prev =>
+//       prev.map(j =>
+//         j.id === cancelJobId ? { ...j, status: 'CANCELLED' } : j
+//       )
+//     );
+
+//     setCancelJobId(null);
+//     setCancelReason('');
+//   };
+
+//   /* ---------------- DETAIL VIEW ---------------- */
+//   if (selectedJob) {
+//     const job = jobs.find(j => j.id === selectedJob);
+//     if (job) {
+//       return <CuttingJobDetail job={job} onBack={() => setSelectedJob(null)} />;
+//     }
+//   }
+
+//   return (
+//     <div className="overflow-hidden">
+
+//       {/* ================= CANCEL MODAL ================= */}
+//       {cancelJobId && (
+//         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+//           <div className="bg-white rounded-lg p-6 w-full max-w-md">
+//             <h3 className="text-lg mb-3">Cancel Job</h3>
+
+//             <textarea
+//               value={cancelReason}
+//               onChange={e => setCancelReason(e.target.value)}
+//               className="w-full border rounded-lg p-3"
+//               rows={4}
+//               placeholder="Reason for cancellation"
+//             />
+
+//             <div className="flex gap-3 mt-4">
+//               <button
+//                 onClick={handleCancelJob}
+//                 className="flex-1 bg-red-600 text-white py-2 rounded-lg"
+//               >
+//                 Confirm
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setCancelJobId(null);
+//                   setCancelReason('');
+//                 }}
+//                 className="flex-1 border py-2 rounded-lg"
+//               >
+//                 Close
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* ================= HEADER ================= */}
+//       <div className="mb-6">
+//         <div className="flex items-center gap-3 mb-4">
+//           <button
+//             onClick={() => setCurrentScreen('dashboard')}
+//             className="p-2 hover:bg-gray-100 rounded-lg"
+//           >
+//             <ArrowLeft className="w-5 h-5" />
+//           </button>
+
+//           <div>
+//             <h1 className="text-2xl text-gray-900">
+//               {isOperator ? 'My Jobs' : 'All Cutting Jobs'}
+//             </h1>
+//             <p className="text-sm text-gray-600">
+//               {filteredJobs.length} job(s) found
+//             </p>
+//           </div>
+//         </div>
+
+//         <div className="flex gap-2">
+//           {['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map(s => (
+//             <button
+//               key={s}
+//               onClick={() => setFilterStatus(s as any)}
+//               className={`px-4 py-2 rounded-lg text-sm ${
+//                 filterStatus === s
+//                   ? s === 'CANCELLED'
+//                     ? 'bg-red-600 text-white'
+//                     : 'bg-blue-600 text-white'
+//                   : 'bg-white border'
+//               }`}
+//             >
+//               {s.replace('_', ' ')}
+//             </button>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* ================= JOB LIST ================= */}
+//       <div className="space-y-4">
+//         {filteredJobs.map(job => {
+//           const isExpanded = expandedJobId === job.id;
+
+//           return (
+//             <div key={job.id} className="bg-white rounded-lg shadow p-6">
+//               <div className="flex justify-between gap-6">
+//                 {/* LEFT */}
+//                 <div className="flex-1">
+//                   <h2 className="text-xl text-gray-900">{job.job_order_no}</h2>
+//                   <StatusBadge status={job.status} />
+
+//                   <p className="text-sm text-gray-600 mt-2">
+//                     {job.material_code} • {job.machine_name}
+//                   </p>
+
+//                   <p className="text-sm mt-2">
+//                     Operator:{' '}
+//                     <span className="text-gray-600">
+//                       {job.operator_name || '-'}
+//                     </span>
+//                   </p>
+
+//                   <p className="text-sm mt-2">
+//                     Supervisor:{' '}
+//                     <span className="text-gray-600">
+//                       {job.supervisor_name || '-'}
+//                     </span>
+//                   </p>
+
+//                   <p className="text-sm mt-2">
+//                     Planned Qty:{' '}
+//                     <span className="text-gray-600">
+//                       {job.planned_output_qty} pcs
+//                     </span>
+//                   </p>
+
+//                   <p className="text-sm mt-2">
+//                     Master Serial No:{' '}
+//                     <span className="text-gray-600">
+//                       {job.fg_code || '-'}
+//                     </span>
+//                   </p>
+
+//                   {isExpanded && (
+//                     <div className="mt-4 border-t pt-4 text-sm text-gray-700 space-y-2">
+//                       <p>Job Date: {job.job_date}</p>
+//                       <p>Shift: {job.shift}</p>
+//                       <p>RM Batch No: {job.rm_batch_no}</p>
+//                       <p>Remarks: {job.remarks || '-'}</p>
+//                     </div>
+//                   )}
+//                 </div>
+
+//                 {/* RIGHT ACTIONS */}
+//                 <div className="flex flex-col items-end gap-3 min-w-[200px]">
+
+//                   {/* 👁 Eye ONLY for IN_PROGRESS */}
+//                  {job.status === 'IN_PROGRESS' && (
+//   <button
+//     onClick={() => setSelectedJob(job.id)}
+//     className="
+//       bg-indigo-50 text-indigo-700
+//       border border-indigo-200
+//       px-4 py-2 rounded-lg
+//       flex items-center gap-2
+//       hover:bg-indigo-100
+//       transition-colors
+//     "
+//   >
+   
+//   </button>
+// )}
+
+
+
+//                   {job.status === 'PLANNED' && (
+//                     <button
+//                       onClick={async () => {
+//                         await supabase
+//                           .from('cutting_jobs')
+//                           .update({ status: 'IN_PROGRESS' })
+//                           .eq('id', job.id);
+
+//                         setJobs(prev =>
+//                           prev.map(j =>
+//                             j.id === job.id
+//                               ? { ...j, status: 'IN_PROGRESS' }
+//                               : j
+//                           )
+//                         );
+//                       }}
+//                       className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+//                     >
+//                       <Play className="w-4 h-4" />
+//                       Start Job
+//                     </button>
+//                   )}
+
+//                   {job.status === 'IN_PROGRESS' && (
+//   <button
+//     onClick={() => setSelectedJob(job.id)}
+//     className="
+//       bg-indigo-50 text-indigo-700
+//       border border-indigo-200
+//       px-4 py-2 rounded-lg
+//       flex items-center gap-2
+//       hover:bg-indigo-100
+//       transition-colors
+//     "
+//   >
+//     <RotateCcw className="w-4 h-4" />
+//     Continue
+//   </button>
+// )}
+
+
+
+//                   {isSupervisor &&
+//                     (job.status === 'PLANNED' ||
+//                       job.status === 'IN_PROGRESS') && (
+//                       <button
+//                         onClick={() => setCancelJobId(job.id)}
+//                         className="bg-red-50 text-red-600 border px-4 py-2 rounded-lg"
+//                       >
+//                         Cancel Job
+//                       </button>
+//                     )}
+//                 </div>
+//               </div>
+
+//               {/* EXPAND BUTTON */}
+//               <div className="mt-4 flex justify-center">
+//                 <button
+//                   onClick={() =>
+//                     setExpandedJobId(isExpanded ? null : job.id)
+//                   }
+//                   className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full"
+//                 >
+//                   {isExpanded ? <ChevronUp /> : <ChevronDown />}
+//                 </button>
+//               </div>
+//             </div>
+//           );
+//         })}
+//       </div>
+//     </div>
+//   );
+// }
+
+// /* ================= STATUS BADGE ================= */
+// function StatusBadge({ status }: { status: string }) {
+//   const map: any = {
+//     PLANNED: ['Planned', 'bg-gray-100 text-gray-800', Clock],
+//     IN_PROGRESS: ['In Progress', 'bg-blue-100 text-blue-800', Play],
+//     COMPLETED: ['Completed', 'bg-green-100 text-green-800', CheckCircle],
+//     CANCELLED: ['Cancelled', 'bg-red-100 text-red-800', XCircle],
+//   };
+
+//   const [label, cls, Icon] = map[status];
+
+//   return (
+//     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${cls}`}>
+//       <Icon className="w-3 h-3" />
+//       {label}
+//     </span>
+//   );
+// }
+// import { RotateCcw } from 'lucide-react';
+
+// import { useState, useEffect, useMemo } from 'react';
+// import {
+//   Eye,
+//   Clock,
+//   Play,
+//   XCircle,
+//   ArrowLeft,
+//   CheckCircle,
+//   ChevronDown,
+//   ChevronUp,
+// } from 'lucide-react';
+
+// import { useApp } from '../context/AppContext';
+// import { supabase } from '../src/config/supabase';
+// import { CuttingJobDetail } from './CuttingJobDetail';
+
+// export function MyJobs() {
+//   const { currentUser, setCurrentScreen } = useApp();
+
+//   if (!currentUser) {
+//     return <div className="p-6">Loading user…</div>;
+//   }
+
+//   /* ---------------- STATE ---------------- */
+//   const [jobs, setJobs] = useState<any[]>([]);
+//   const [filterStatus, setFilterStatus] = useState<
+//     'ALL' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
+//   >('ALL');
+
+//   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+//   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+
+//   // CANCEL STATE
+//   const [cancelJobId, setCancelJobId] = useState<string | null>(null);
+//   const [cancelReason, setCancelReason] = useState('');
+
+//   const isOperator = currentUser.role === 'OPERATOR';
+//   const isSupervisor = currentUser.role !== 'OPERATOR';
+
+//   /* ---------------- FETCH ---------------- */
+//   useEffect(() => {
+//     const fetchJobs = async () => {
+//       const { data } = await supabase
+//         .from('my_jobs_view')
+//         .select('*')
+//         .order('job_date', { ascending: false });
+
+//       setJobs(data || []);
+//     };
+
+//     fetchJobs();
+//   }, []);
+
+//   /* ---------------- FILTER ---------------- */
+//   const filteredJobs = useMemo(() => {
+//     return jobs.filter(job => {
+//       if (isOperator && job.operator_id !== currentUser.id) return false;
+//       if (filterStatus !== 'ALL' && job.status !== filterStatus) return false;
+//       return true;
+//     });
+//   }, [jobs, filterStatus, isOperator, currentUser]);
+
+//   /* ---------------- CANCEL HANDLER ---------------- */
+//   const handleCancelJob = async () => {
+//     if (!cancelReason.trim()) {
+//       alert('Please provide a reason');
+//       return;
+//     }
+
+//     await supabase
+//       .from('cutting_jobs')
+//       .update({
+//         status: 'CANCELLED',
+//         cancel_reason: cancelReason,
+//       })
+//       .eq('id', cancelJobId);
+
+//     setJobs(prev =>
+//       prev.map(j =>
+//         j.id === cancelJobId ? { ...j, status: 'CANCELLED' } : j
+//       )
+//     );
+
+//     setCancelJobId(null);
+//     setCancelReason('');
+//   };
+
+//   /* ---------------- DETAIL VIEW ---------------- */
+//   if (selectedJob) {
+//     const job = jobs.find(j => j.id === selectedJob);
+//     if (job) {
+//       return <CuttingJobDetail job={job} onBack={() => setSelectedJob(null)} />;
+//     }
+//   }
+
+//   return (
+//     <div className="overflow-hidden">
+
+//       {/* ================= CANCEL MODAL ================= */}
+//      {cancelJobId && (
+//   <div
+//     className="
+//       fixed inset-0 z-50
+//       flex items-center justify-center
+//       bg-gray-900/60
+//       backdrop-blur-sm
+//       transition-opacity
+//     "
+//   >
+//     <div
+//       className="
+//         bg-white rounded-2xl
+//         w-full max-w-md
+//         p-6
+//         shadow-2xl
+//         animate-[modalIn_0.2s_ease-out]
+//       "
+//     >
+//       <h3 className="text-lg font-semibold text-gray-900 mb-3">
+//         Cancel Job
+//       </h3>
+
+//       <textarea
+//         value={cancelReason}
+//         onChange={e => setCancelReason(e.target.value)}
+//         className="
+//           w-full border border-gray-300
+//           rounded-xl p-3
+//           focus:outline-none focus:ring-2 focus:ring-red-500
+//         "
+//         rows={4}
+//         placeholder="Reason for cancellation"
+//       />
+
+//       <div className="flex gap-3 mt-5">
+//         <button
+//           onClick={handleCancelJob}
+//           className="
+//             flex-1 bg-red-600 text-white
+//             py-2.5 rounded-xl
+//             hover:bg-red-700
+//             transition-colors
+//           "
+//         >
+//           Confirm
+//         </button>
+
+//         <button
+//           onClick={() => {
+//             setCancelJobId(null);
+//             setCancelReason('');
+//           }}
+//           className="
+//             flex-1 border border-gray-300
+//             py-2.5 rounded-xl
+//             hover:bg-gray-50
+//             transition-colors
+//           "
+//         >
+//           Close
+//         </button>
+//       </div>
+//     </div>
+//   </div>
+// )}
+
+//       {/* ================= HEADER ================= */}
+//       <div className="mb-6">
+//         <div className="flex items-center gap-3 mb-4">
+//           <button
+//             onClick={() => setCurrentScreen('dashboard')}
+//             className="p-2 hover:bg-gray-100 rounded-lg"
+//           >
+//             <ArrowLeft className="w-5 h-5" />
+//           </button>
+
+//           <div>
+//             <h1 className="text-2xl text-gray-900">
+//               {isOperator ? 'My Jobs' : 'All Cutting Jobs'}
+//             </h1>
+//             <p className="text-sm text-gray-600">
+//               {filteredJobs.length} job(s) found
+//             </p>
+//           </div>
+//         </div>
+
+//         <div className="flex gap-2">
+//           {['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map(s => (
+//             <button
+//               key={s}
+//               onClick={() => setFilterStatus(s as any)}
+//               className={`px-4 py-2 rounded-lg text-sm ${
+//                 filterStatus === s
+//                   ? s === 'CANCELLED'
+//                     ? 'bg-red-600 text-white'
+//                     : 'bg-blue-600 text-white'
+//                   : 'bg-white border'
+//               }`}
+//             >
+//               {s.replace('_', ' ')}
+//             </button>
+//           ))}
+//         </div>
+//       </div>
+
+//       {/* ================= JOB LIST ================= */}
+//       <div className="space-y-4">
+//         {filteredJobs.map(job => {
+//           const isExpanded = expandedJobId === job.id;
+
+//           return (
+//             <div key={job.id} className="bg-white rounded-lg shadow p-6">
+//               <div className="flex justify-between gap-6">
+//                 {/* LEFT */}
+//                 <div className="flex-1">
+//                   <h2 className="text-xl text-gray-900">{job.job_order_no}</h2>
+//                   <StatusBadge status={job.status} />
+
+//                   <p className="text-sm text-gray-600 mt-2">
+//                     {job.material_code} • {job.machine_name}
+//                   </p>
+
+//                   <p className="text-sm mt-2">
+//                     Operator:{' '}
+//                     <span className="text-gray-600">
+//                       {job.operator_name || '-'}
+//                     </span>
+//                   </p>
+
+//                   <p className="text-sm mt-2">
+//                     Supervisor:{' '}
+//                     <span className="text-gray-600">
+//                       {job.supervisor_name || '-'}
+//                     </span>
+//                   </p>
+
+//                   <p className="text-sm mt-2">
+//                     Planned Qty:{' '}
+//                     <span className="text-gray-600">
+//                       {job.planned_output_qty} pcs
+//                     </span>
+//                   </p>
+
+//                   <p className="text-sm mt-2">
+//                     Master Serial No:{' '}
+//                     <span className="text-gray-600">
+//                       {job.fg_code || '-'}
+//                     </span>
+//                   </p>
+
+//                   {isExpanded && (
+//                     <div className="mt-4 border-t pt-4 text-sm text-gray-700 space-y-2">
+//                       <p>Job Date: {job.job_date}</p>
+//                       <p>Shift: {job.shift}</p>
+//                       <p>RM Batch No: {job.rm_batch_no}</p>
+//                       <p>Remarks: {job.remarks || '-'}</p>
+//                     </div>
+//                   )}
+//                 </div>
+
+//                 {/* RIGHT ACTIONS */}
+//                 <div className="flex flex-col items-end gap-3 min-w-[200px]">
+
+//                   {/* 👁 Eye ONLY for IN_PROGRESS */}
+//                  {job.status === 'IN_PROGRESS' && (
+//   <button
+//     onClick={() => setSelectedJob(job.id)}
+//     className="
+//       bg-indigo-50 text-indigo-700
+//       border border-indigo-200
+//       px-4 py-2 rounded-lg
+//       flex items-center gap-2
+//       hover:bg-indigo-100
+//       transition-colors
+//     "
+//   >
+   
+//   </button>
+// )}
+
+
+
+//                   {job.status === 'PLANNED' && (
+//                     <button
+//                       onClick={async () => {
+//                         await supabase
+//                           .from('cutting_jobs')
+//                           .update({ status: 'IN_PROGRESS' })
+//                           .eq('id', job.id);
+
+//                         setJobs(prev =>
+//                           prev.map(j =>
+//                             j.id === job.id
+//                               ? { ...j, status: 'IN_PROGRESS' }
+//                               : j
+//                           )
+//                         );
+//                       }}
+//                       className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+//                     >
+//                       <Play className="w-4 h-4" />
+//                       Start Job
+//                     </button>
+//                   )}
+
+//                   {job.status === 'IN_PROGRESS' && (
+// //   <button
+// //     onClick={() => setSelectedJob(job.id)}
+// //     className="
+// //       bg-indigo-50 text-indigo-700
+// //       border border-indigo-200
+// //       px-4 py-2 rounded-lg
+// //       flex items-center gap-2
+// //       hover:bg-indigo-100
+// //       transition-colors
+// //     "
+// //   >
+// //     <RotateCcw className="w-4 h-4" />
+// //     Continue
+// //   </button>
+// // )}
+// <button
+//   onClick={() => setSelectedJob(job.id)}
+//   className="
+//     bg-blue-600 text-white
+//     px-4 py-2 rounded-lg
+//     flex items-center gap-2
+//     hover:bg-blue-700
+//     transition-colors
+//     shadow-sm
+//   "
+// >
+//   <RotateCcw className="w-4 h-4" />
+//   Continue
+// </button>
+//                   )}
+
+
+//                   {isSupervisor &&
+//                     (job.status === 'PLANNED' ||
+//                       job.status === 'IN_PROGRESS') && (
+//                       <button
+//                         onClick={() => setCancelJobId(job.id)}
+//                         className="bg-red-50 text-red-600 border px-4 py-2 rounded-lg"
+//                       >
+//                         Cancel Job
+//                       </button>
+//                     )}
+//                 </div>
+//               </div>
+
+//               {/* EXPAND BUTTON */}
+//               <div className="mt-4 flex justify-center">
+//                 <button
+//                   onClick={() =>
+//                     setExpandedJobId(isExpanded ? null : job.id)
+//                   }
+//                   className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full"
+//                 >
+//                   {isExpanded ? <ChevronUp /> : <ChevronDown />}
+//                 </button>
+//               </div>
+//             </div>
+//           );
+//         })}
+//       </div>
+//     </div>
+//   );
+// }
+
+// /* ================= STATUS BADGE ================= */
+// function StatusBadge({ status }: { status: string }) {
+//   const map: any = {
+//     PLANNED: ['Planned', 'bg-gray-100 text-gray-800', Clock],
+//     IN_PROGRESS: ['In Progress', 'bg-blue-100 text-blue-800', Play],
+//     COMPLETED: ['Completed', 'bg-green-100 text-green-800', CheckCircle],
+//     CANCELLED: ['Cancelled', 'bg-red-100 text-red-800', XCircle],
+//   };
+
+//   const [label, cls, Icon] = map[status];
+
+//   return (
+//     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm ${cls}`}>
+//       <Icon className="w-3 h-3" />
+//       {label}
+//     </span>
+//   );
+// }
+import { RotateCcw } from 'lucide-react';
+
+import { useState, useEffect, useMemo } from 'react';
 import {
   Eye,
   Clock,
   Play,
   XCircle,
-  AlertTriangle,
   ArrowLeft,
   CheckCircle,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 
 import { useApp } from '../context/AppContext';
@@ -664,37 +2324,33 @@ import { CuttingJobDetail } from './CuttingJobDetail';
 export function MyJobs() {
   const { currentUser, setCurrentScreen } = useApp();
 
-  // Safety guard – DO NOT CHANGE
   if (!currentUser) {
     return <div className="p-6">Loading user…</div>;
   }
 
-  /* ---------------- STATE (UNCHANGED) ---------------- */
+  /* ---------------- STATE ---------------- */
   const [jobs, setJobs] = useState<any[]>([]);
   const [filterStatus, setFilterStatus] = useState<
     'ALL' | 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
   >('ALL');
 
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+
+  // CANCEL STATE
   const [cancelJobId, setCancelJobId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState('');
 
-  /* ---------------- ROLE LOGIC (UNCHANGED) ---------------- */
   const isOperator = currentUser.role === 'OPERATOR';
   const isSupervisor = currentUser.role !== 'OPERATOR';
 
-  /* ---------------- FETCH JOBS (UNCHANGED) ---------------- */
+  /* ---------------- FETCH ---------------- */
   useEffect(() => {
     const fetchJobs = async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('my_jobs_view')
         .select('*')
         .order('job_date', { ascending: false });
-
-      if (error) {
-        console.error('Failed to fetch jobs:', error);
-        return;
-      }
 
       setJobs(data || []);
     };
@@ -702,7 +2358,7 @@ export function MyJobs() {
     fetchJobs();
   }, []);
 
-  /* ---------------- FILTER LOGIC (UNCHANGED) ---------------- */
+  /* ---------------- FILTER ---------------- */
   const filteredJobs = useMemo(() => {
     return jobs.filter(job => {
       if (isOperator && job.operator_id !== currentUser.id) return false;
@@ -711,86 +2367,109 @@ export function MyJobs() {
     });
   }, [jobs, filterStatus, isOperator, currentUser]);
 
-  /* ---------------- CANCEL HANDLER (UNCHANGED) ---------------- */
+  /* ---------------- CANCEL HANDLER ---------------- */
   const handleCancelJob = async () => {
     if (!cancelReason.trim()) {
-      alert('Please provide a reason for cancellation');
+      alert('Please provide a reason');
       return;
     }
 
-    try {
-      await supabase
-        .from('cutting_jobs')
-        .update({
-          status: 'CANCELLED',
-          cancel_reason: cancelReason,
-        })
-        .eq('id', cancelJobId);
+    await supabase
+      .from('cutting_jobs')
+      .update({
+        status: 'CANCELLED',
+        cancel_reason: cancelReason,
+      })
+      .eq('id', cancelJobId);
 
-      setJobs(prev =>
-        prev.map(j =>
-          j.id === cancelJobId ? { ...j, status: 'CANCELLED' } : j
-        )
-      );
+    setJobs(prev =>
+      prev.map(j =>
+        j.id === cancelJobId ? { ...j, status: 'CANCELLED' } : j
+      )
+    );
 
-      setCancelJobId(null);
-      setCancelReason('');
-    } catch (error) {
-      console.error('Cancel job failed:', error);
-      alert('Failed to cancel job');
-    }
+    setCancelJobId(null);
+    setCancelReason('');
   };
 
-  /* ---------------- JOB DETAIL VIEW (UNCHANGED) ---------------- */
+  /* ---------------- DETAIL VIEW ---------------- */
   if (selectedJob) {
     const job = jobs.find(j => j.id === selectedJob);
     if (job) {
-      return (
-        <CuttingJobDetail
-          job={job}
-          onBack={() => setSelectedJob(null)}
-        />
-      );
+      return <CuttingJobDetail job={job} onBack={() => setSelectedJob(null)} />;
     }
   }
 
   return (
     <div className="overflow-hidden">
 
-      {/* ================= CANCEL MODAL (UNCHANGED) ================= */}
-      {cancelJobId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-gray-900 mb-2">Cancel Job Order</h3>
+      {/* ================= CANCEL MODAL ================= */}
+     {cancelJobId && (
+  <div
+    className="
+      fixed inset-0 z-50
+      flex items-center justify-center
+      bg-gray-900/60
+      backdrop-blur-sm
+      transition-opacity
+    "
+  >
+    <div
+      className="
+        bg-white rounded-2xl
+        w-full max-w-md
+        p-6
+        shadow-2xl
+        animate-[modalIn_0.2s_ease-out]
+      "
+    >
+      <h3 className="text-lg font-semibold text-gray-900 mb-3">
+        Cancel Job
+      </h3>
 
-            <textarea
-              value={cancelReason}
-              onChange={e => setCancelReason(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg"
-              rows={4}
-              placeholder="Provide reason for cancelling this job order..."
-            />
+      <textarea
+        value={cancelReason}
+        onChange={e => setCancelReason(e.target.value)}
+        className="
+          w-full border border-gray-300
+          rounded-xl p-3
+          focus:outline-none focus:ring-2 focus:ring-red-500
+        "
+        rows={4}
+        placeholder="Reason for cancellation"
+      />
 
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={handleCancelJob}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg"
-              >
-                Confirm Cancellation
-              </button>
-              <button
-                onClick={() => {
-                  setCancelJobId(null);
-                  setCancelReason('');
-                }}
-                className="px-4 py-2 border rounded-lg"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="flex gap-3 mt-5">
+        <button
+          onClick={handleCancelJob}
+          className="
+            flex-1 bg-red-600 text-white
+            py-2.5 rounded-xl
+            hover:bg-red-700
+            transition-colors
+          "
+        >
+          Confirm
+        </button>
+
+        <button
+          onClick={() => {
+            setCancelJobId(null);
+            setCancelReason('');
+          }}
+          className="
+            flex-1 border border-gray-300
+            py-2.5 rounded-xl
+            hover:bg-gray-50
+            transition-colors
+          "
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* ================= HEADER ================= */}
       <div className="mb-6">
@@ -812,21 +2491,20 @@ export function MyJobs() {
           </div>
         </div>
 
-        {/* FILTER TABS (UNCHANGED) */}
         <div className="flex gap-2">
-          {['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map(status => (
+          {['ALL', 'PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].map(s => (
             <button
-              key={status}
-              onClick={() => setFilterStatus(status as any)}
+              key={s}
+              onClick={() => setFilterStatus(s as any)}
               className={`px-4 py-2 rounded-lg text-sm ${
-                filterStatus === status
-                  ? status === 'CANCELLED'
+                filterStatus === s
+                  ? s === 'CANCELLED'
                     ? 'bg-red-600 text-white'
                     : 'bg-blue-600 text-white'
                   : 'bg-white border'
               }`}
             >
-              {status.replace('_', ' ')}
+              {s.replace('_', ' ')}
             </button>
           ))}
         </div>
@@ -834,107 +2512,165 @@ export function MyJobs() {
 
       {/* ================= JOB LIST ================= */}
       <div className="space-y-4">
-        {filteredJobs.map(job => (
-          <div key={job.id} className="bg-white rounded-lg shadow p-6">
+        {filteredJobs.map(job => {
+          const isExpanded = expandedJobId === job.id;
 
-            {/* ===== CARD LAYOUT (ALIGNMENT ONLY) ===== */}
-            <div className="flex justify-between gap-6">
+          return (
+            <div key={job.id} className="bg-white rounded-lg shadow p-6">
+              <div className="flex justify-between gap-6">
+                {/* LEFT */}
+                <div className="flex-1">
+                  <h2 className="text-xl text-gray-900">{job.job_order_no}</h2>
+                  <StatusBadge status={job.status} />
 
-              {/* -------- LEFT : JOB INFO -------- */}
-              <div className="flex-1">
-                <h2 className="text-xl text-gray-900">{job.job_order_no}</h2>
-                <StatusBadge status={job.status} />
+                  <p className="text-sm text-gray-600 mt-2">
+                    {job.material_code} • {job.machine_name}
+                  </p>
 
-                <p className="text-sm text-gray-600 mt-2">
-                  {job.material_code} • {job.machine_name}
-                </p>
+                  <p className="text-sm mt-2">
+                    Operator:{' '}
+                    <span className="text-gray-600">
+                      {job.operator_name || '-'}
+                    </span>
+                  </p>
 
-                <p className="text-sm text-gray-600 mt-1">
-                  Operator:{' '}
-                  <span className="text-gray-900 font-medium">
-                    {job.operator_name || '-'}
-                  </span>
-                </p>
+                  <p className="text-sm mt-2">
+                    Supervisor:{' '}
+                    <span className="text-gray-600">
+                      {job.supervisor_name || '-'}
+                    </span>
+                  </p>
 
-                {/* MASTER JOB DETAILS – SHOWN FOR ALL STATES */}
-                {['PLANNED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'].includes(job.status) && (
-                  <div className="mt-2 space-y-1 text-sm">
-                    <p>
-                      Supervisor:{' '}
-                      <strong>{job.supervisor_name || '-'}</strong>
-                    </p>
-                    <p>
-                      Planned Qty:{' '}
-                      <strong>{job.planned_output_qty ?? '-'} pcs</strong>
-                    </p>
-                    <p>
-                      Master Serial No:{' '}
-                      <strong>{job.fg_code || '-'}</strong>
-                    </p>
-                  </div>
-                )}
-              </div>
+                  <p className="text-sm mt-2">
+                    Planned Qty:{' '}
+                    <span className="text-gray-600">
+                      {job.planned_output_qty} pcs
+                    </span>
+                  </p>
 
-              {/* -------- RIGHT : ACTIONS -------- */}
-              <div className="flex flex-col items-end gap-3 min-w-[200px]">
+                  <p className="text-sm mt-2">
+                    Master Serial No:{' '}
+                    <span className="text-gray-600">
+                      {job.fg_code || '-'}
+                    </span>
+                  </p>
 
-                {/* Eye icon */}
-                <button
-                  onClick={() => setSelectedJob(job.id)}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  <Eye />
-                </button>
+                  {isExpanded && (
+                    <div className="mt-4 border-t pt-4 text-sm text-gray-700 space-y-2">
+                      <p>Job Date: {job.job_date}</p>
+                      <p>Shift: {job.shift}</p>
+                      <p>RM Batch No: {job.rm_batch_no}</p>
+                      <p>Remarks: {job.remarks || '-'}</p>
+                    </div>
+                  )}
+                </div>
 
-                {/* Start / Continue */}
-                {job.status === 'PLANNED' && (
-                  <button
-                    onClick={async () => {
-                      await supabase
-                        .from('cutting_jobs')
-                        .update({ status: 'IN_PROGRESS' })
-                        .eq('id', job.id);
+                {/* RIGHT ACTIONS */}
+                <div className="flex flex-col items-end gap-3 min-w-[200px]">
 
-                      setJobs(prev =>
-                        prev.map(j =>
-                          j.id === job.id ? { ...j, status: 'IN_PROGRESS' } : j
-                        )
-                      );
-                    }}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                  >
-                    <Play className="w-4 h-4" />
-                    Start Job
-                  </button>
-                )}
+                  {/* 👁 Eye ONLY for IN_PROGRESS */}
+                 {job.status === 'IN_PROGRESS' && (
+  <button
+    onClick={() => setSelectedJob(job.id)}
+    className="
+      bg-indigo-50 text-indigo-700
+      border border-indigo-200
+      px-4 py-2 rounded-lg
+      flex items-center gap-2
+      hover:bg-indigo-100
+      transition-colors
+    "
+  >
+   
+  </button>
+)}
 
-                {job.status === 'IN_PROGRESS' && (
-                  <button
-                    onClick={() => {
-                      setSelectedJob(job.id);
-                      setCurrentScreen('cutting-operation');
-                    }}
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-                  >
-                    <Play className="w-4 h-4" />
-                    Continue
-                  </button>
-                )}
 
-                {/* Cancel */}
-                {isSupervisor &&
-                  (job.status === 'PLANNED' || job.status === 'IN_PROGRESS') && (
+
+                  {job.status === 'PLANNED' && (
                     <button
-                      onClick={() => setCancelJobId(job.id)}
-                      className="bg-red-50 text-red-600 border px-4 py-2 rounded-lg"
+                      onClick={async () => {
+                        await supabase
+                          .from('cutting_jobs')
+                          .update({ status: 'IN_PROGRESS' })
+                          .eq('id', job.id);
+
+                        setJobs(prev =>
+                          prev.map(j =>
+                            j.id === job.id
+                              ? { ...j, status: 'IN_PROGRESS' }
+                              : j
+                          )
+                        );
+                      }}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
                     >
-                      Cancel Job
+                      <Play className="w-4 h-4" />
+                      Start Job
                     </button>
                   )}
+
+                  {job.status === 'IN_PROGRESS' && (
+//   <button
+//     onClick={() => setSelectedJob(job.id)}
+//     className="
+//       bg-indigo-50 text-indigo-700
+//       border border-indigo-200
+//       px-4 py-2 rounded-lg
+//       flex items-center gap-2
+//       hover:bg-indigo-100
+//       transition-colors
+//     "
+//   >
+//     <RotateCcw className="w-4 h-4" />
+//     Continue
+//   </button>
+// )}
+<button
+  onClick={() => setSelectedJob(job.id)}
+  className="
+    bg-blue-600 text-white
+    px-4 py-2 rounded-lg
+    flex items-center gap-2
+    hover:bg-blue-700
+    transition-colors
+    shadow-sm
+  "
+>
+  <RotateCcw className="w-4 h-4" />
+  Continue
+</button>
+                  )}
+
+
+                  {isSupervisor &&
+                    (job.status === 'PLANNED' ||
+                      job.status === 'IN_PROGRESS') && (
+                      <button
+                        onClick={() => setCancelJobId(job.id)}
+                        className="bg-red-50 text-red-600 border px-4 py-2 rounded-lg"
+                      >
+                        Cancel Job
+                      </button>
+                    )}
+                </div>
+              </div>
+
+              {/* EXPAND BUTTON */}
+              <div className="mt-4 flex justify-center">
+{/* VIZUALIZATION HERE */}
+                <button
+                  onClick={() =>
+                    setExpandedJobId(isExpanded ? null : job.id)
+                  }
+                  className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full"
+                >
+                  {isExpanded ? <ChevronUp /> : <ChevronDown />}
+                </button>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -958,4 +2694,3 @@ function StatusBadge({ status }: { status: string }) {
     </span>
   );
 }
-
