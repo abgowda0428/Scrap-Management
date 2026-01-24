@@ -2518,21 +2518,6 @@ export function MyJobs() {
           return (
             <div key={job.id} className="bg-white rounded-lg shadow p-6">
               <div className="flex justify-between gap-6">
-                {/* ================= EXPANDED VISUAL SECTION ================= */}
-{expandedJobId === job.id && (
-  <div className="mt-6 border-t pt-6 space-y-6">
-
-
-    {/* NOTES
-    <div className="text-sm">
-      <span className="text-gray-500">Notes:</span>{' '}
-      <span className="text-gray-700">
-        {job.remarks || '—'}
-      </span>
-    </div> */}
-  </div>
-)}
-
                 {/* LEFT */}
                 <div className="flex-1">
                   <h2 className="text-xl text-gray-900">{job.job_order_no}</h2>
