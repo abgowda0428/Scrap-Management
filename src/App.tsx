@@ -265,23 +265,14 @@ import { AccessDenied } from './components/AccessDenied';
   // ================= ROLE PERMISSIONS =================
   const ROLE_PERMISSIONS: Record<string, string[]> = {
     OPERATOR: [
-      'dashboard',
       'create-job',
       'my-jobs',
-      'scrap-entry',
-      'cut-pieces',
-      'end-pieces',
+      'materials',
     ],
 
     SUPERVISOR: [
-      'dashboard',
       'create-job',
       'my-jobs',
-      'scrap-entry',
-      'cut-pieces',
-      'end-pieces',
-      'approval-dashboard',
-      'reports',
       'materials',
     ],
 

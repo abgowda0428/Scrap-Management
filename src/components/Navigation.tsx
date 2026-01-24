@@ -375,7 +375,7 @@ export function Navigation() {
         id: 'approval-dashboard',
         label: 'Approvals',
         icon: CheckSquare,
-        roles: ['SUPERVISOR','MANAGER','OPERATOR'],
+        roles: ['SUPERVISOR','MANAGER'],
       },
 
       {
@@ -389,7 +389,7 @@ export function Navigation() {
         id: 'materials',
         label: 'Materials',
         icon: Package,
-        roles: ['SUPERVISOR', 'MANAGER'],
+        roles: ['SUPERVISOR', 'MANAGER','OPERATOR'],
       },
 
       {
