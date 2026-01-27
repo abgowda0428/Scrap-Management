@@ -2369,18 +2369,36 @@ export function MyJobs() {
 
   /* ---------------- CANCEL HANDLER ---------------- */
   const handleCancelJob = async () => {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      alert("User not logged in");
+      return;
+    }
+
     if (!cancelReason.trim()) {
       alert('Please provide a reason');
       return;
     }
 
-    await supabase
+    const { error } = await supabase
       .from('cutting_jobs')
       .update({
         status: 'CANCELLED',
         cancel_reason: cancelReason,
+        cancelled_at: new Date().toISOString(),
+        cancelled_by: user.id
       })
       .eq('id', cancelJobId);
+
+    if (error) {
+      console.error("Cancel failed:", error);
+      alert("Failed to cancel job");
+      return;
+    }
 
     setJobs(prev =>
       prev.map(j =>
@@ -2391,6 +2409,7 @@ export function MyJobs() {
     setCancelJobId(null);
     setCancelReason('');
   };
+
 
   /* ---------------- DETAIL VIEW ---------------- */
   if (selectedJob) {
