@@ -2398,12 +2398,12 @@ export function MyJobs() {
       alert("Failed to cancel job");
       return;
     }
-
     setJobs(prev =>
       prev.map(j =>
         j.id === cancelJobId ? { ...j, status: 'CANCELLED' } : j
       )
     );
+
 
     setCancelJobId(null);
     setCancelReason('');
@@ -2646,40 +2646,37 @@ export function MyJobs() {
                   )}
                   {/* ================= CANCEL DETAILS ================= */}
 {job.status === 'CANCELLED' && (
-  <div
-    className="
-      mt-4
-      rounded-xl
-      border border-red-300
-      bg-red-50
-      p-5
-      text-sm
-    "
-  >
-    <h4 className="text-base font-semibold text-red-700 mb-3">
-      Cancellation Details
+  <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-5 text-sm">
+    
+    <h4 className="text-sm font-semibold text-gray-700 mb-3">
+      Job Status Update
     </h4>
 
-    <div className="space-y-2">
-      <p className="text-red-800">
-        <span className="font-semibold">Reason:</span>{' '}
+    <div className="border-l-2 border-red-400 pl-4 space-y-2">
+      <p className="text-red-700 font-semibold">
+        Job Cancelled
+      </p>
+
+      <p className="text-gray-700">
+        <span className="font-medium">Reason:</span>{' '}
         {job.cancel_reason || '-'}
       </p>
 
-      <p className="text-red-800">
-        <span className="font-semibold">Cancelled At:</span>{' '}
+      <p className="text-gray-600">
+        <span className="font-medium">Cancelled At:</span>{' '}
         {job.cancelled_at
           ? new Date(job.cancelled_at).toLocaleString()
           : '-'}
       </p>
 
-      <p className="text-red-800">
-        <span className="font-semibold">Cancelled By:</span>{' '}
+      <p className="text-gray-600">
+        <span className="font-medium">Cancelled By:</span>{' '}
         {job.cancelled_by_name || job.cancelled_by || '-'}
       </p>
     </div>
   </div>
 )}
+
 
                   {isSupervisor &&
                     (job.status === 'PLANNED' ||
