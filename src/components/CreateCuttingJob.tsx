@@ -522,6 +522,12 @@ export function CreateCuttingJob() {
   const [machines, setMachines] = useState<any[]>([]);
   const [materials, setMaterials] = useState<any[]>([]);
   const [finishedGoods, setFinishedGoods] = useState<any[]>([]);
+  const [materialSearch, setMaterialSearch] = useState('');
+
+const [showMaterialDropdown, setShowMaterialDropdown] = useState(false);
+
+  
+
 
   /* --------------------------------------------------
      FORM STATE
@@ -550,6 +556,19 @@ export function CreateCuttingJob() {
   const activeMachines = machines; // All fetched are ACTIVE
   //const activeMaterials = materials.filter(m => m.current_stock_qty > 0); prajeeth
   const activeMaterials = materials;
+  const filteredMaterials = materialSearch.trim()
+  ? activeMaterials
+      .filter(m => {
+        const q = materialSearch.toLowerCase();
+        return (
+          m.item_code.toLowerCase().includes(q) ||
+          m.material_identification.toLowerCase().includes(q)
+        );
+      })
+      .slice(0, 10)
+  : [];
+
+
 
 
   /* --------------------------------------------------
@@ -853,24 +872,68 @@ export function CreateCuttingJob() {
                 </div>
 
                 {/* Raw Material Code */}
-                <div className="md:col-span-2">
-                  <label className="block text-sm text-gray-700 mb-2">
-                    Raw Material Code (Item Code) *
-                  </label>
-                  <select
-                    required
-                    value={formData.material_id ?? ''}
-                    onChange={(e) => setFormData({ ...formData, material_id: e.target.value || null })}
-                    className="w-full px-4 py-3 lg:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select raw material...</option>
-                    {activeMaterials.map(material => (
-                      <option key={material.id} value={material.id}>
-                        {material.item_code} - {material.material_identification}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+               {/* Raw Material Code */}
+{/* Raw Material Code (Searchable Select – SINGLE SLOT) */}
+{/* Raw Material Code (Searchable Select – SINGLE SLOT) */}
+<div className="md:col-span-2 relative">
+  <label className="block text-sm text-gray-700 mb-2">
+    Raw Material Code (Item Code) *
+  </label>
+
+  <input
+    type="text"
+    value={materialSearch}
+    onChange={(e) => {
+      setMaterialSearch(e.target.value);
+      setShowMaterialDropdown(true);
+      setFormData({ ...formData, material_id: null });
+    }}
+    onFocus={() => setShowMaterialDropdown(true)}
+    placeholder="Search RM-Code Here..."
+    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+
+  {showMaterialDropdown && materialSearch.trim() && (
+    <div
+      className="absolute z-50 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow max-h-60 overflow-auto"
+      onMouseDown={(e) => e.preventDefault()} // 🔒 IMPORTANT FIX
+    >
+      {filteredMaterials.length ? (
+        filteredMaterials.map(material => (
+          <div
+            key={material.id}
+            onClick={() => {
+              setMaterialSearch(
+                `${material.item_code} - ${material.material_identification}`
+              );
+              setFormData({ ...formData, material_id: material.id });
+              setShowMaterialDropdown(false);
+            }}
+            className="px-4 py-2 cursor-pointer hover:bg-blue-100"
+          >
+            <div className="font-medium">{material.item_code}</div>
+            <div className="text-xs text-gray-500">
+              {material.material_identification}
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="px-4 py-2 text-sm text-gray-500">
+          No materials found
+        </div>
+      )}
+    </div>
+  )}
+
+  {/* Validation message */}
+  {!formData.material_id && materialSearch && (
+    <p className="text-xs text-red-600 mt-1">
+      Please select a material from the list
+    </p>
+  )}
+</div>
+
+
 
                 {/* Material Identification - Auto-filled */}
                 {selectedMaterial && (
