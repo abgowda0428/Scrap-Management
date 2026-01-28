@@ -2304,7 +2304,6 @@
 //   );
 // }
 import { RotateCcw } from 'lucide-react';
-
 import { useState, useEffect, useMemo } from 'react';
 import {
   Eye,
@@ -2587,22 +2586,7 @@ export function MyJobs() {
                 {/* RIGHT ACTIONS */}
                 <div className="flex flex-col items-end gap-3 min-w-[200px]">
 
-                  {/* 👁 Eye ONLY for IN_PROGRESS */}
-                 {job.status === 'IN_PROGRESS' && (
-  <button
-    onClick={() => setSelectedJob(job.id)}
-    className="
-      bg-indigo-50 text-indigo-700
-      border border-indigo-200
-      px-4 py-2 rounded-lg
-      flex items-center gap-2
-      hover:bg-indigo-100
-      transition-colors
-    "
-  >
-   
-  </button>
-)}
+         
 
 
 
@@ -2696,10 +2680,6 @@ export function MyJobs() {
     </div>
   </div>
 )}
-
-
-
-
 
                   {isSupervisor &&
                     (job.status === 'PLANNED' ||
