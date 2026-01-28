@@ -2579,7 +2579,7 @@ export function MyJobs() {
                       <p>Job Date: {job.job_date}</p>
                       <p>Shift: {job.shift}</p>
                       <p>RM Batch No: {job.rm_batch_no}</p>
-                      <p>Remarks: {job.remarks || '-'}</p>
+                      <p>Remarks: {job.notes || '-'}</p>
                     </div>
                   )}
                 </div>
@@ -2660,6 +2660,45 @@ export function MyJobs() {
   Continue
 </button>
                   )}
+                  {/* ================= CANCEL DETAILS ================= */}
+{job.status === 'CANCELLED' && (
+  <div
+    className="
+      mt-4
+      rounded-xl
+      border border-red-300
+      bg-red-50
+      p-5
+      text-sm
+    "
+  >
+    <h4 className="text-base font-semibold text-red-700 mb-3">
+      Cancellation Details
+    </h4>
+
+    <div className="space-y-2">
+      <p className="text-red-800">
+        <span className="font-semibold">Reason:</span>{' '}
+        {job.cancel_reason || '-'}
+      </p>
+
+      <p className="text-red-800">
+        <span className="font-semibold">Cancelled At:</span>{' '}
+        {job.cancelled_at
+          ? new Date(job.cancelled_at).toLocaleString()
+          : '-'}
+      </p>
+
+      <p className="text-red-800">
+        <span className="font-semibold">Cancelled By:</span>{' '}
+        {job.cancelled_by_name || job.cancelled_by || '-'}
+      </p>
+    </div>
+  </div>
+)}
+
+
+
 
 
                   {isSupervisor &&
