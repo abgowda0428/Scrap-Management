@@ -1134,7 +1134,8 @@ const [showMaterialDropdown, setShowMaterialDropdown] = useState(false);
 
             {/* Cost Calculation */}
             {selectedMaterial && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+  <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+
                 <h3 className="text-sm text-blue-900 mb-2">Cost Calculation</h3>
                 <div className="space-y-1">
                   <p className="text-xs text-blue-700">
