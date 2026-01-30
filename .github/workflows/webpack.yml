@@ -1,0 +1,41 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # 1️⃣ Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # 2️⃣ Validate required env vars
+      - name: Validate environment variables
+        run: |
+          test -n "${{ secrets.VITE_SUPABASE_URL }}"
+          test -n "${{ secrets.VITE_SUPABASE_ANON_KEY }}"
+
+      # 3️⃣ Build application (acts as main test)
+      - name: Build application
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      # 4️⃣ Dockerfile validation
+      - name: Build Docker image (test)
+        run: docker build .
